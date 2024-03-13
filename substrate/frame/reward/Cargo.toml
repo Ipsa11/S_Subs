@@ -1,0 +1,36 @@
+[package]
+name = "pallet-reward"
+version = "1.0.0"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+frame-support = { path = "../../frame/support", default-features = false }
+pallet-staking = { path = "../../frame/staking", default-features = false }
+pallet-treasury = { path = "../../frame/treasury", default-features = false }
+frame-system = { path = "../../frame/system", default-features = false }
+sp-runtime = { path = "../../primitives/runtime", default-features = false }
+scale-info = { version = "2.5.0", default-features = false, features = ["derive"] }
+parity-scale-codec = { version = "3.6.1", default-features = false, features = [ "derive" ] }
+frame-benchmarking = { version = "4.0.0-dev", default-features = false, optional = true, path = "../../frame/benchmarking" }
+frame-election-provider-support = { version = "4.0.0-dev", default-features = false, path = "../election-provider-support" } 
+
+[dev-dependencies]
+sp-staking = { path = "../../primitives/staking"}
+pallet-timestamp = { path = "../../frame/timestamp"}
+pallet-session = { path = "../../frame/session"}
+sp-io = { path = "../../primitives/io" }
+sp-core = { path = "../../primitives/core"}
+saitama-core-primitives ={path ="../../../saitachain/core-primitives"}
+pallet-balances = { path = "../../frame/balances" }
+
+[features]
+default = ["std"]
+std = ["parity-scale-codec/std", "scale-info/std",
+ "sp-runtime/std","pallet-staking/std","pallet-treasury/std",
+ "pallet-balances/std","frame-election-provider-support/std",
+  "frame-support/std", "frame-system/std"]
+
+runtime-benchmarks = ["frame-benchmarking/runtime-benchmarks"]
+try-runtime = ["frame-support/try-runtime"]
