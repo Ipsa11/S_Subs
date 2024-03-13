@@ -640,19 +640,9 @@ impl<T: Config<I>, I: 'static> OnUnbalanced<NegativeImbalanceOf<T, I>> for Palle
 pub trait TreasuryAccountId<AccountId> {
 	fn accountid() -> AccountId;
 }
-impl<T:Config<I> + pallet::Config, I: 'static> TreasuryAccountId<fp_account::AccountId20> for Pallet<T, I>{
-	fn accountid() -> fp_account::AccountId20{
-		let account = Self::account_id();	
-		convert_to_account_id32::<T>(account)
+impl<T:Config<I> + pallet::Config, I: 'static> TreasuryAccountId<T::AccountId> for Pallet<T, I>{
+	fn accountid() -> T::AccountId{
+	 Self::account_id()	
 	}
 
-}
-fn convert_to_account_id32<T: Config>(account_id: T::AccountId) -> fp_account::AccountId20
-where
-	T::AccountId: Encode,
-{
-	let encoded: Vec<u8> = account_id.encode();
-	let mut account_id32_bytes = [0u8; 20];
-	account_id32_bytes.copy_from_slice(&encoded[..20]);
-	fp_account::AccountId20::from(account_id32_bytes)
 }

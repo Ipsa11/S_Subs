@@ -27,7 +27,6 @@ pallet-balances = { path = "../balances", default-features = false}
 sp-runtime = { path = "../../primitives/runtime", default-features = false}
 sp-std = { path = "../../primitives/std", default-features = false}
 node-primitives = { path = "../../bin/node/primitives", default-features = false}
-fp-account = { path = "../../../saitachain/evm-primitives/account", default-features = false}
 
 [dev-dependencies]
 sp-core = { path = "../../primitives/core" }
@@ -42,7 +41,6 @@ std = [
 	"frame-support/std",
 	"frame-system/std",
 	"pallet-balances/std",
-	"fp-account/std",
 	"pallet-utility/std",
 	"scale-info/std",
 	"serde",

@@ -8854,7 +8854,6 @@ dependencies = [
 name = "pallet-treasury"
 version = "4.0.0-dev"
 dependencies = [
- "fp-account",
  "frame-benchmarking",
  "frame-support",
  "frame-system",
