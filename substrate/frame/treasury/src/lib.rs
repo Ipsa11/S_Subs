@@ -640,7 +640,7 @@ impl<T: Config<I>, I: 'static> OnUnbalanced<NegativeImbalanceOf<T, I>> for Palle
 pub trait TreasuryAccountId<AccountId> {
 	fn accountid() -> AccountId;
 }
-impl<T:Config<I> + pallet::Config, I: 'static> TreasuryAccountId<T::AccountId> for Pallet<T, I>{
+impl<T:Config<I>, I: 'static> TreasuryAccountId<T::AccountId> for Pallet<T, I>{
 	fn accountid() -> T::AccountId{
 	 Self::account_id()	
 	}
