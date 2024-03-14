@@ -103,6 +103,7 @@ pub mod pallet {
 			+ sp_std::fmt::Debug
 			+ Default
 			+ From<u64>
+			+ From<u128>
 			+ TypeInfo
 			+ MaxEncodedLen;
 		/// Time used for computing era duration.
