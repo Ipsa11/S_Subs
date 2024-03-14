@@ -543,6 +543,10 @@ impl pallet_transaction_payment::Config for Runtime {
 		MinimumMultiplier,
 		MaximumMultiplier,
 	>;
+	type SudoAccount = Sudo;
+	type ValidatorIdOf = pallet_staking::StashOf<Self>;
+	type ValidatorSet = Historical;
+	type DataProvider = <Runtime as pallet_election_provider_multi_phase::Config>::DataProvider;
 }
 
 impl pallet_asset_tx_payment::Config for Runtime {
@@ -667,6 +671,18 @@ impl pallet_staking::Config for Runtime {
 	type EventListeners = NominationPools;
 	type WeightInfo = pallet_staking::weights::SubstrateWeight<Runtime>;
 	type BenchmarkingConfig = StakingBenchmarkingConfig;
+	type RewardDistribute = Reward;
+}
+impl pallet_reward::Config for Runtime{
+
+	type Balance = Balance;
+	type RuntimeEvent = RuntimeEvent;
+	type ValidatorIdOf = pallet_staking::StashOf<Self>;
+	type ValidatorSet = Historical;
+	type DataProvider = <Runtime as pallet_election_provider_multi_phase::Config>::DataProvider;
+	type TreasuryAccount = Treasury;
+	type RewardCurrency = Balances;
+	
 }
 
 impl pallet_fast_unstake::Config for Runtime {
@@ -1195,9 +1211,8 @@ impl pallet_treasury::Config for Runtime {
 	type ProposalBond = ProposalBond;
 	type ProposalBondMinimum = ProposalBondMinimum;
 	type ProposalBondMaximum = ();
+	type MyReward = Reward;
 	type SpendPeriod = SpendPeriod;
-	type Burn = Burn;
-	type BurnDestination = ();
 	type SpendFunds = Bounties;
 	type WeightInfo = pallet_treasury::weights::SubstrateWeight<Runtime>;
 	type MaxApprovals = MaxApprovals;
@@ -2072,6 +2087,7 @@ construct_runtime!(
 		RootTesting: pallet_root_testing,
 		ConvictionVoting: pallet_conviction_voting,
 		Whitelist: pallet_whitelist,
+		Reward:pallet_reward,
 		AllianceMotion: pallet_collective::<Instance3>,
 		Alliance: pallet_alliance,
 		NominationPools: pallet_nomination_pools,

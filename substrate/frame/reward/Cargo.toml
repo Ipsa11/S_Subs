@@ -22,7 +22,6 @@ pallet-timestamp = { path = "../../frame/timestamp"}
 pallet-session = { path = "../../frame/session"}
 sp-io = { path = "../../primitives/io" }
 sp-core = { path = "../../primitives/core"}
-saitama-core-primitives ={path ="../../../saitachain/core-primitives"}
 pallet-balances = { path = "../../frame/balances" }
 
 [features]

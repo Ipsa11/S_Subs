@@ -105,6 +105,7 @@ pallet-ranked-collective = { path = "../../../frame/ranked-collective", default-
 pallet-recovery = { path = "../../../frame/recovery", default-features = false}
 pallet-referenda = { path = "../../../frame/referenda", default-features = false}
 pallet-remark = { path = "../../../frame/remark", default-features = false}
+pallet-reward = { path = "../../../frame/reward", default-features = false}
 pallet-root-testing = { path = "../../../frame/root-testing", default-features = false}
 pallet-salary = { path = "../../../frame/salary", default-features = false}
 pallet-session = { path = "../../../frame/session", default-features = false , features = [ "historical" ]}
@@ -154,6 +155,7 @@ std = [
 	"pallet-alliance/std",
 	"pallet-asset-conversion-tx-payment/std",
 	"pallet-asset-conversion/std",
+	"pallet-reward/std",
 	"pallet-asset-rate/std",
 	"pallet-asset-tx-payment/std",
 	"pallet-assets/std",

@@ -18,7 +18,7 @@ lazy_static = "1.4.0"
 strum = { version = "0.24.1", features = ["derive"], default-features = false }
 sp-core = { path = "../core" }
 sp-runtime = { path = "../runtime" }
-fp-account = { path = "../../../saitachain/evm-primitives/account" }
+# fp-account = { path = "../../../saitachain/evm-primitives/account" }
 
 [features]
 # This feature adds Bandersnatch crypto primitives.
