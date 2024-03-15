@@ -1,7 +1,6 @@
 # sc-telemetry
 
-Substrate's client telemetry is a part of Substrate that allows ingesting telemetry data
-with for example [Polkadot telemetry](https://github.com/paritytech/substrate-telemetry).
+Substrate's client telemetry is a part of Substrate that allows ingesting telemetry data.
 
 It works using Tokio's [tracing](https://github.com/tokio-rs/tracing/) library. The telemetry
 information uses tracing's logging to report the telemetry data which is then retrieved by a

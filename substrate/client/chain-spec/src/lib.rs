@@ -133,7 +133,6 @@
 //! // The verbosity goes from `0` to `9`. With `0` being the mode with the lowest verbosity.
 //! "telemetryEndpoints": [
 //!   [
-//!     "/dns/telemetry.polkadot.io/tcp/443/x-parity-wss/%2Fsubmit%2F",
 //!     0
 //!   ]
 //! ],

@@ -17,7 +17,7 @@
 
 //! # Authority discovery pallet.
 //!
-//! This pallet is used by the `client/authority-discovery` and by polkadot's parachain logic
+//! This pallet is used by the `client/authority-discovery` and by  parachain logic
 //! to retrieve the current and the next set of authorities.
 
 // Ensure we're `no_std` when compiling for Wasm.

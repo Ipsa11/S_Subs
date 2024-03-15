@@ -16,8 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-/// Kusama value size distribution
-pub const KUSAMA_STATE_DISTRIBUTION: &[(u32, u32)] = &[
+pub const SAITA_STATE_DISTRIBUTION: &[(u32, u32)] = &[
 	(32, 35),
 	(33, 20035),
 	(34, 5369),

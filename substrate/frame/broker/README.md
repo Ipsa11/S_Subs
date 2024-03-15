@@ -1,15 +1,11 @@
 # Pallet Broker
 
-Brokerage tool for managing Polkadot Core scheduling.
+Brokerage tool for managing Core scheduling.
 
 Properly described in RFC-0001 Agile Coretime.
 
 ## Implemnentation Specifics
 
-### Core Mask Bits
-
-This is 1/80th of a Polkadot Core per timeslice. Assuming timeslices are 80 blocks, then this
-indicates usage of a single core one time over a timeslice.
 
 ### The Sale
 

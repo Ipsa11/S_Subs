@@ -103,16 +103,7 @@ Percentiles 99th, 95th, 75th: 68758, 67843, 67749
 Writing weights to "extrinsic_weights.rs"
 ```
 
-The complete command for Polkadot looks like this:
-```sh
-cargo run --profile=production -- benchmark overhead --chain=polkadot-dev --wasm-execution=compiled --weight-path=runtime/polkadot/constants/src/weights/
-```
-
-This will overwrite the the
-[block_weights.rs](https://github.com/paritytech/polkadot/blob/c254e5975711a6497af256f6831e9a6c752d28f5/runtime/polkadot/constants/src/weights/block_weights.rs)
-and
-[extrinsic_weights.rs](https://github.com/paritytech/polkadot/blob/c254e5975711a6497af256f6831e9a6c752d28f5/runtime/polkadot/constants/src/weights/extrinsic_weights.rs)
-files in the Polkadot runtime directory. You can try the same for *Rococo* and to see that the results slightly differ.
+tly differ.
 👉 It is paramount to use `--profile=production` and `--wasm-execution=compiled` as the results are otherwise useless.
 
 ## Output Interpretation

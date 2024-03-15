@@ -30,7 +30,6 @@ pub mod try_state;
 
 /// A wrapper for a runtime that the functions of this crate expect.
 ///
-/// For example, this can be the `Runtime` type of the Polkadot runtime.
 pub trait RuntimeT<I: 'static>:
 	pallet_staking::Config + pallet_bags_list::Config<I> + frame_system::Config
 {

@@ -715,7 +715,6 @@ pub fn grandpa_peers_set_config(
 	sc_network::config::NonDefaultSetConfig {
 		notifications_protocol: protocol_name,
 		fallback_names: grandpa_protocol_name::LEGACY_NAMES.iter().map(|&n| n.into()).collect(),
-		// Notifications reach ~256kiB in size at the time of writing on Kusama and Polkadot.
 		max_notification_size: 1024 * 1024,
 		handshake: None,
 		set_config: sc_network::config::SetConfig {

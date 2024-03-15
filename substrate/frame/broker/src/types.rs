@@ -34,7 +34,7 @@ pub type RelayAccountIdOf<T> = <<T as Config>::Coretime as CoretimeInterface>::A
 /// Relay-chain block number with a fixed divisor of Config::TimeslicePeriod.
 pub type Timeslice = u32;
 /// Counter for the total number of set bits over every core's `CoreMask`. `u32` so we don't
-/// ever get an overflow. This is 1/80th of a Polkadot Core per timeslice. Assuming timeslices are
+/// ever get an overflow. This is 1/80th of a  Core per timeslice. Assuming timeslices are
 /// 80 blocks, then this indicates usage of a single core one time over a timeslice.
 pub type CoreMaskBitCount = u32;
 /// The same as `CoreMaskBitCount` but signed.
@@ -84,12 +84,12 @@ pub struct RegionRecord<AccountId, Balance> {
 	pub end: Timeslice,
 	/// The owner of the Region.
 	pub owner: AccountId,
-	/// The amount paid to Polkadot for this Region, or `None` if renewal is not allowed.
+	/// The amount paid for this Region, or `None` if renewal is not allowed.
 	pub paid: Option<Balance>,
 }
 pub type RegionRecordOf<T> = RegionRecord<<T as SConfig>::AccountId, BalanceOf<T>>;
 
-/// An distinct item which can be scheduled on a Polkadot Core.
+/// An distinct item which can be scheduled on a Core.
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
 pub struct ScheduleItem {
 	/// The regularity parts in which this Item will be scheduled on the Core.
@@ -117,7 +117,7 @@ pub struct InstaPoolHistoryRecord<Balance> {
 	/// The total amount of Coretime (measured in Core Mask Bits minus any contributions which have
 	/// already been paid out.
 	pub private_contributions: CoreMaskBitCount,
-	/// The total amount of Coretime (measured in Core Mask Bits contributed by the Polkadot System
+	/// The total amount of Coretime (measured in Core Mask Bits contributed by the System
 	/// in this timeslice.
 	pub system_contributions: CoreMaskBitCount,
 	/// The payout remaining for the `private_contributions`, or `None` if the revenue is not yet
@@ -180,7 +180,7 @@ pub struct StatusRecord {
 	/// The current size of the Instantaneous Coretime Pool, measured in
 	/// Core Mask Bits.
 	pub private_pool_size: CoreMaskBitCount,
-	/// The current amount of the Instantaneous Coretime Pool which is provided by the Polkadot
+	/// The current amount of the Instantaneous Coretime Pool which is provided by the
 	/// System, rather than provided as a result of privately operated Coretime.
 	pub system_pool_size: CoreMaskBitCount,
 	/// The last (Relay-chain) timeslice which we committed to the Relay-chain.
@@ -232,7 +232,7 @@ pub struct SaleInfoRecord<Balance, BlockNumber> {
 }
 pub type SaleInfoRecordOf<T> = SaleInfoRecord<BalanceOf<T>, BlockNumberFor<T>>;
 
-/// Record for Polkadot Core reservations (generally tasked with the maintenance of System
+/// Record for  Core reservations (generally tasked with the maintenance of System
 /// Chains).
 pub type ReservationsRecord<Max> = BoundedVec<Schedule, Max>;
 pub type ReservationsRecordOf<T> = ReservationsRecord<<T as Config>::MaxReservedCores>;
@@ -246,7 +246,7 @@ pub struct LeaseRecordItem {
 	pub task: TaskId,
 }
 
-/// Record for Polkadot Core legacy leases.
+/// Record for  Core legacy leases.
 pub type LeasesRecord<Max> = BoundedVec<LeaseRecordItem, Max>;
 pub type LeasesRecordOf<T> = LeasesRecord<<T as Config>::MaxLeasedCores>;
 

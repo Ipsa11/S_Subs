@@ -871,7 +871,6 @@ pub mod tests {
 		);
 	}
 
-	// This test reproduces an actual real-world issue: https://github.com/polkadot-js/apps/issues/9103
 	parameterized_test!(
 		storage_iter_does_not_return_out_of_prefix_keys,
 		storage_iter_does_not_return_out_of_prefix_keys_inner

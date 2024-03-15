@@ -66,7 +66,6 @@ frame_support::construct_runtime!(
 		Example: common::outer_enums::pallet::{Pallet, Config<T>, Event<T>, Error<T>},
 		Instance1Example: common::outer_enums::pallet::<Instance1>::{ Pallet, Config<T>, Event<T> },
 
-		// This pallet does not mention the Error type, but it must be propagated (similarly to the polkadot/kusama).
 		Example2: common::outer_enums::pallet2::{Pallet, Config<T>, Event<T> },
 		Instance1Example2: common::outer_enums::pallet2::<Instance1>::{Pallet, Config<T>, Event<T>},
 

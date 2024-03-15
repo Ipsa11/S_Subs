@@ -505,9 +505,6 @@ impl<T: Config> PoolMember<T> {
 		// multiplied by a point. The worse case of a point is 10x the granularity of the balance
 		// (10x is the common configuration of `MaxPointsToBalance`).
 		//
-		// Assuming roughly the current issuance of polkadot (12,047,781,394,999,601,455, which is
-		// 1.2 * 10^9 * 10^10 = 1.2 * 10^19), the worse case point value is around 10^20.
-		//
 		// The final multiplication is:
 		//
 		// rc * 10^20 / 10^18 = rc * 100
@@ -1348,8 +1345,8 @@ impl<T: Config> RewardPool<T> {
 		//
 		// which, with the current numbers, is a miniscule fraction of the u128 capacity.
 		//
-		// Thus, adding two values of type reward counter should be safe for ages in a chain like
-		// Polkadot. The important note here is that `reward_pool.last_recorded_reward_counter` only
+		// Thus, adding two values of type reward counter should be safe for ages in a chain.
+		// The important note here is that `reward_pool.last_recorded_reward_counter` only
 		// ever accumulates, but its semantics imply that it is less than total_issuance, when
 		// represented as `FixedU128`, which means it is less than `total_issuance * 10^18`.
 		//
@@ -1531,7 +1528,7 @@ pub mod pallet {
 		///
 		/// See the inline code docs of `Member::pending_rewards` and `RewardPool::update_recorded`
 		/// for example analysis. A [`sp_runtime::FixedU128`] should be fine for chains with balance
-		/// types similar to that of Polkadot and Kusama, in the absence of severe slashing (or
+		/// types similar to that in the absence of severe slashing (or
 		/// prevented via a reasonable `MaxPointsToBalance`), for many many years to come.
 		type RewardCounter: FixedPointNumber + MaxEncodedLen + TypeInfo + Default + codec::FullCodec;
 

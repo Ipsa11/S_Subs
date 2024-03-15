@@ -28,7 +28,6 @@ use kitchensink_runtime::{
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sc_chain_spec::ChainSpecExtension;
 use sc_service::ChainType;
-use sc_telemetry::TelemetryEndpoints;
 use serde::{Deserialize, Serialize};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
@@ -42,8 +41,6 @@ pub use kitchensink_runtime::RuntimeGenesisConfig;
 pub use node_primitives::{AccountId, Balance, Signature};
 
 type AccountPublic = <Signature as Verify>::Signer;
-
-const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 
 /// Node `ChainSpec` extensions.
 ///
@@ -188,10 +185,7 @@ pub fn staging_testnet_config() -> ChainSpec {
 		ChainType::Live,
 		staging_testnet_config_genesis,
 		boot_nodes,
-		Some(
-			TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])
-				.expect("Staging telemetry url is valid; qed"),
-		),
+		None,
 		None,
 		None,
 		None,

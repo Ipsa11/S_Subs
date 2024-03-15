@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-//! Keystore (and session key management) for ed25519 based chains like Polkadot.
+//! Keystore (and session key management) for ed25519 based .
 
 #![warn(missing_docs)]
 use sp_core::crypto::KeyTypeId;

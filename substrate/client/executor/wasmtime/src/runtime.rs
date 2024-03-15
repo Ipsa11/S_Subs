@@ -364,8 +364,6 @@ fn common_config(semantics: &Semantics) -> std::result::Result<wasmtime::Config,
 			.max_unused_warm_slots(4)
 			// Pooling needs a bunch of hard limits to be set; if we go over
 			// any of these then the instantiation will fail.
-			//
-			// Current minimum values for kusama (as of 2022-04-14):
 			//   size: 32384
 			//   table_elements: 1249
 			//   memory_pages: 2070

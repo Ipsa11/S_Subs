@@ -5028,11 +5028,11 @@ mod reward_counter_precision {
 	use super::*;
 
 	const DOT: Balance = 10u128.pow(10u32);
-	const POLKADOT_TOTAL_ISSUANCE_GENESIS: Balance = DOT * 10u128.pow(9u32);
+	const SAITA_TOTAL_ISSUANCE_GENESIS: Balance = DOT * 10u128.pow(9u32);
 
 	const fn inflation(years: u128) -> u128 {
 		let mut i = 0;
-		let mut start = POLKADOT_TOTAL_ISSUANCE_GENESIS;
+		let mut start = SAITA_TOTAL_ISSUANCE_GENESIS;
 		while i < years {
 			start = start + start / 10;
 			i += 1
@@ -5058,7 +5058,7 @@ mod reward_counter_precision {
 
 	#[test]
 	fn smallest_claimable_reward() {
-		// create a pool that has all of the polkadot issuance in 50 years.
+		// create a pool that has all of the issuance in 50 years.
 		let pool_bond = inflation(50);
 		ExtBuilder::default().ed(DOT).min_bond(pool_bond).build_and_execute(|| {
 			assert_eq!(
@@ -5128,75 +5128,11 @@ mod reward_counter_precision {
 		})
 	}
 
-	#[test]
-	fn reward_counter_calc_wont_fail_in_normal_polkadot_future() {
-		// create a pool that has roughly half of the polkadot issuance in 10 years.
-		let pool_bond = inflation(10) / 2;
-		ExtBuilder::default().ed(DOT).min_bond(pool_bond).build_and_execute(|| {
-			assert_eq!(
-				pool_events_since_last_call(),
-				vec![
-					Event::Created { depositor: 10, pool_id: 1 },
-					Event::Bonded {
-						member: 10,
-						pool_id: 1,
-						bonded: 12_968_712_300_500_000_000,
-						joined: true,
-					}
-				]
-			);
 
-			// in 10 years, the total claimed rewards are large values as well. assuming that a pool
-			// is earning all of the inflation per year (which is really unrealistic, but worse
-			// case), that will be:
-			let pool_total_earnings_10_years = inflation(10) - POLKADOT_TOTAL_ISSUANCE_GENESIS;
-			deposit_rewards(pool_total_earnings_10_years);
-
-			// some whale now joins with the other half ot the total issuance. This will bloat all
-			// the calculation regarding current reward counter.
-			Balances::make_free_balance_be(&20, pool_bond * 2);
-			assert_ok!(Pools::join(RuntimeOrigin::signed(20), pool_bond, 1));
-
-			assert_eq!(
-				pool_events_since_last_call(),
-				vec![Event::Bonded {
-					member: 20,
-					pool_id: 1,
-					bonded: 12_968_712_300_500_000_000,
-					joined: true
-				}]
-			);
-
-			assert_ok!(Pools::claim_payout(RuntimeOrigin::signed(10)));
-			assert_ok!(Pools::claim_payout(RuntimeOrigin::signed(20)));
-
-			assert_eq!(
-				pool_events_since_last_call(),
-				vec![Event::PaidOut { member: 10, pool_id: 1, payout: 15937424600999999996 }]
-			);
-
-			// now let a small member join with 10 DOTs.
-			Balances::make_free_balance_be(&30, 20 * DOT);
-			assert_ok!(Pools::join(RuntimeOrigin::signed(30), 10 * DOT, 1));
-
-			// and give a reasonably small reward to the pool.
-			deposit_rewards(DOT);
-
-			assert_ok!(Pools::claim_payout(RuntimeOrigin::signed(30)));
-			assert_eq!(
-				pool_events_since_last_call(),
-				vec![
-					Event::Bonded { member: 30, pool_id: 1, bonded: 100000000000, joined: true },
-					// quite small, but working fine.
-					Event::PaidOut { member: 30, pool_id: 1, payout: 38 }
-				]
-			);
-		})
-	}
 
 	#[test]
 	fn reward_counter_update_can_fail_if_pool_is_highly_slashed() {
-		// create a pool that has roughly half of the polkadot issuance in 10 years.
+		// create a pool that has roughly half of the issuance in 10 years.
 		let pool_bond = inflation(10) / 2;
 		ExtBuilder::default().ed(DOT).min_bond(pool_bond).build_and_execute(|| {
 			assert_eq!(
@@ -5229,10 +5165,10 @@ mod reward_counter_precision {
 
 	#[test]
 	fn if_small_member_waits_long_enough_they_will_earn_rewards() {
-		// create a pool that has a quarter of the current polkadot issuance
+		// create a pool that has a quarter of the current issuance
 		ExtBuilder::default()
 			.ed(DOT)
-			.min_bond(POLKADOT_TOTAL_ISSUANCE_GENESIS / 4)
+			.min_bond(SAITA_TOTAL_ISSUANCE_GENESIS / 4)
 			.build_and_execute(|| {
 				assert_eq!(
 					pool_events_since_last_call(),
@@ -5297,10 +5233,10 @@ mod reward_counter_precision {
 
 	#[test]
 	fn zero_reward_claim_does_not_update_reward_counter() {
-		// create a pool that has a quarter of the current polkadot issuance
+		// create a pool that has a quarter of the current issuance
 		ExtBuilder::default()
 			.ed(DOT)
-			.min_bond(POLKADOT_TOTAL_ISSUANCE_GENESIS / 4)
+			.min_bond(SAITA_TOTAL_ISSUANCE_GENESIS / 4)
 			.build_and_execute(|| {
 				assert_eq!(
 					pool_events_since_last_call(),

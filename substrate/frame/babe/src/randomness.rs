@@ -76,9 +76,7 @@ pub struct RandomnessFromTwoEpochsAgo<T>(sp_std::marker::PhantomData<T>);
 /// Adversaries should not possess many block production slots towards the beginning or
 /// end of every epoch, but they possess some influence over when they possess more slots.
 ///
-/// As an example usage, we determine parachain auctions ending times in Polkadot using
-/// `RandomnessFromOneEpochAgo` because it reduces bias from `ParentBlockRandomness` and
-/// does not require the extra finality delay of `RandomnessFromTwoEpochsAgo`.
+
 pub struct RandomnessFromOneEpochAgo<T>(sp_std::marker::PhantomData<T>);
 
 /// Randomness produced semi-freshly with each block, but inherits limitations of

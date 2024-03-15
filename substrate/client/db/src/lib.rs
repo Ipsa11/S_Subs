@@ -348,9 +348,6 @@ impl DatabaseSource {
 	pub fn path(&self) -> Option<&Path> {
 		match self {
 			// as per https://github.com/paritytech/substrate/pull/9500#discussion_r684312550
-			//
-			// IIUC this is needed for polkadot to create its own dbs, so until it can use parity db
-			// I would think rocksdb, but later parity-db.
 			DatabaseSource::Auto { paritydb_path, .. } => Some(paritydb_path),
 			#[cfg(feature = "rocksdb")]
 			DatabaseSource::RocksDb { path, .. } => Some(path),

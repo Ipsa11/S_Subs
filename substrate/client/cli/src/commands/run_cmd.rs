@@ -101,9 +101,7 @@ pub struct RunCmd {
 
 	/// Specify browser Origins allowed to access the HTTP & WS RPC servers.
 	/// A comma-separated list of origins (protocol://domain or special `null`
-	/// value). Value of `all` will disable origin validation. Default is to
-	/// allow localhost and <https://polkadot.js.org> origins. When running in
-	/// --dev mode the default is to allow all origins.
+	/// value).
 	#[arg(long, value_name = "ORIGINS", value_parser = parse_cors)]
 	pub rpc_cors: Option<Cors>,
 

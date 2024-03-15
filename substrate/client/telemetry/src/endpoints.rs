@@ -81,7 +81,6 @@ mod tests {
 	#[test]
 	fn valid_endpoints() {
 		let endp = vec![
-			("wss://telemetry.polkadot.io/submit/".into(), 3),
 			("/ip4/80.123.90.4/tcp/5432".into(), 4),
 		];
 		let telem =

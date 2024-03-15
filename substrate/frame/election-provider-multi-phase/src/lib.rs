@@ -143,13 +143,13 @@
 //! select only a small number of emergency winners (which would greatly restrict the next validator
 //! set, if this pallet is used with `pallet-staking`). If the failure is for other technical
 //! reasons, then a simple and safe way to generate supports is using the staking-miner binary
-//! provided in the Polkadot repository. This binary has a subcommand named `emergency-solution`
+//! provided in the repository. This binary has a subcommand named `emergency-solution`
 //! which is capable of connecting to a live network, and generating appropriate `supports` using a
 //! standard algorithm, and outputting the `supports` in hex format, ready for submission. Note that
-//! while this binary lives in the Polkadot repository, this particular subcommand of it can work
+//! while this binary lives in the repository, this particular subcommand of it can work
 //! against any substrate-based chain.
 //!
-//! See the `staking-miner` documentation in the Polkadot repository for more information.
+//! See the `staking-miner` documentation in the  repository for more information.
 //!
 //! ## Feasible Solution (correct solution)
 //!
@@ -192,7 +192,7 @@
 //! ## Future Plans
 //!
 //! **Emergency-phase recovery script**: This script should be taken out of staking-miner in
-//! polkadot and ideally live in `substrate/utils/frame/elections`.
+//!  and ideally live in `substrate/utils/frame/elections`.
 //!
 //! **Challenge Phase**. We plan on adding a third phase to the pallet, called the challenge phase.
 //! This is a phase in which no further solutions are processed, and the current best solution might

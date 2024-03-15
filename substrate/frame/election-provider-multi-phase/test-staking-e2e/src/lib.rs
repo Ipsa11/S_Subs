@@ -127,8 +127,6 @@ fn offchainify_works() {
 }
 
 #[test]
-/// Replicates the Kusama incident of 8th Dec 2022 and its resolution through the governance
-/// fallback.
 ///
 /// After enough slashes exceeded the `Staking::OffendingValidatorsThreshold`, the staking pallet
 /// set `Forcing::ForceNew`. When a new session starts, staking will start to force a new era and

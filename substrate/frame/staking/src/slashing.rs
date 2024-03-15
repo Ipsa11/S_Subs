@@ -47,7 +47,6 @@
 //! has multiple misbehaviors. However, accounting for such cases is necessary
 //! to deter a class of "rage-quit" attacks.
 //!
-//! Based on research at <https://research.web3.foundation/en/latest/polkadot/slashing/npos.html>
 
 use crate::{
 	BalanceOf, Config, Error, Exposure, NegativeImbalanceOf, NominatorSlashInEra,

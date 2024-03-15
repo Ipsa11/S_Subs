@@ -1104,7 +1104,7 @@ fn kusama_estimate() {
 }
 
 #[test]
-fn polkadot_estimate() {
+fn saitama_estimate() {
 	use crate::WeightInfo;
 	let block_time = frame_support::weights::Weight::from_parts(
 		frame_support::weights::constants::WEIGHT_REF_TIME_PER_SECOND * 2,

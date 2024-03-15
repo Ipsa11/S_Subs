@@ -178,9 +178,7 @@ rustup target add wasm32-unknown-unknown --toolchain nightly
 If you want to guarantee that your build works on your computer as you update Rust and other dependencies, you should
 use a specific Rust nightly version that is known to be compatible with the version of Substrate they are using; this
 version will vary from project to project and different projects may use different mechanisms to communicate this
-version to developers. For instance, the Polkadot client specifies this information in its [release
-notes](https://github.com/paritytech/polkadot/releases).
-
+version to developers.
 ```bash
 # Specify the specific nightly toolchain in the date below:
 rustup install nightly-<yyyy-MM-dd>

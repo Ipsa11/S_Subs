@@ -134,7 +134,6 @@ fn transaction_fee_is_correct() {
 	// weight of transfer call as of now: 1_000_000
 	// if weight of the cheapest weight would be 10^7, this would be 10^9, which is:
 	//   - 1 MILLICENTS in substrate node.
-	//   - 1 milli-dot based on current polkadot runtime.
 	// (this baed on assigning 0.1 CENT to the cheapest tx with `weight = 100`)
 	let mut t = new_test_ext(compact_code_unwrap());
 	t.insert(<frame_system::Account<Runtime>>::hashed_key_for(alice()), new_account_info(100));

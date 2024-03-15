@@ -13,17 +13,6 @@
 #
 # # Usage
 #
-# 1. Build `target/release/substrate` binary: `cargo build --release`
-# 2. Start networks and containers:
-#    `sudo docker-compose -f .maintain/sentry-node/docker-compose.yml up`
-# 3. Connect to nodes:
-#   - validator-a: localhost:9944
-#   - validator-b: localhost:9945
-#   - light-c: localhost:9946
-#   - via polkadot.js/apps: https://polkadot.js.org/apps/?rpc=ws%3A%2F%2Flocalhost%3A<NODE_PORT>#/explorer
-#   - grafana: localhost:3001
-#   - prometheus: localhost:9090
-
 
 version: "3.7"
 services:

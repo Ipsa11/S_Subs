@@ -864,7 +864,6 @@ mod score {
 
 	#[test]
 	fn score_comparison_large_value() {
-		// some random value taken from eras in kusama.
 		let initial =
 			[12488167277027543u128, 5559266368032409496, 118749283262079244270992278287436446];
 		// this claim is 0.04090% better in the third component. It should be accepted as better if

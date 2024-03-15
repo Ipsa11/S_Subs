@@ -15,13 +15,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! > Made with *Substrate*, for *Polkadot*.
-//!
+//! > Made with *Substrate*.
+//!s
 //! [![github]](https://github.com/paritytech/substrate/frame/fast-unstake) -
-//! [![polkadot]](https://polkadot.network)
 //!
-//! [polkadot]:
-//!     https://img.shields.io/badge/polkadot-E6007A?style=for-the-badge&logo=polkadot&logoColor=white
 //! [github]:
 //!     https://img.shields.io/badge/github-8da0cb?style=for-the-badge&labelColor=555555&logo=github
 //!
@@ -53,8 +50,6 @@
 //! optimal position in a bag, the [`Pallet::put_in_front_of`] or [`Pallet::put_in_front_of_other`]
 //! can be used.
 //!
-//! Additional reading, about how this pallet is used in the context of Polkadot's staking system:
-//! <https://polkadot.network/blog/staking-update-september-2021/#bags-list-in-depth>
 //!
 //! ## Examples
 //!

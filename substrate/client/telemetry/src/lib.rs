@@ -16,9 +16,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-//! Substrate's client telemetry is a part of substrate that allows ingesting telemetry data
-//! with for example [Polkadot telemetry](https://github.com/paritytech/substrate-telemetry).
-//!
 //! It works using Tokio's [tracing](https://github.com/tokio-rs/tracing/) library. The telemetry
 //! information uses tracing's logging to report the telemetry data which is then retrieved by a
 //! tracing `Layer`. This layer will then send the data through an asynchronous channel to a

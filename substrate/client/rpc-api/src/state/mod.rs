@@ -137,7 +137,6 @@ pub trait StateApi<Hash> {
 	/// interpretation of the traces requires an understanding of the Substrate chain's block
 	/// execution.
 	///
-	/// [Link to conceptual map of trace structure for Polkadot and Kusama block execution.][2]
 	///
 	/// [1]: https://crates.io/crates/tracing
 	/// [2]: https://docs.google.com/drawings/d/1vZoJo9jaXlz0LmrdTOgHck9_1LsfuQPRmTr-5g1tOis/edit?usp=sharing
@@ -169,8 +168,6 @@ pub trait StateApi<Hash> {
 	/// - Run the node with the wasm blob overrides by placing them in a folder with all your
 	///   runtimes,
 	/// and passing the path of this folder to your chain, e.g.:
-	/// - `./target/release/polkadot --wasm-runtime-overrides /home/user/my-custom-wasm-runtimes`
-	///
 	/// You can also find some pre-built tracing enabled wasm runtimes in [substrate-archive][2]
 	///
 	/// [Source.][3]
@@ -252,7 +249,7 @@ pub trait StateApi<Hash> {
 	/// will be filtered by storage key (so non-storage events will **not** show up).
 	/// You can specify any length of a storage key prefix (i.e. if a specified storage
 	/// key is in the beginning of an events storage key it is considered a match).
-	/// Example: for balance tracking on Polkadot & Kusama you would likely want
+	/// Example: for balance tracking you would likely want
 	/// to track changes to account balances with the frame_system::Account storage item,
 	/// which is a map from `AccountId` to `AccountInfo`. The key filter for this would be
 	/// the storage prefix for the map:

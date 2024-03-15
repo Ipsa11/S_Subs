@@ -138,7 +138,6 @@ type BalanceOf<T> = <<T as Config>::OnChargeTransaction as OnChargeTransaction<T
 /// Meaning that fees can change by around ~23% per day, given extreme congestion.
 ///
 /// More info can be found at:
-/// <https://research.web3.foundation/en/latest/polkadot/overview/2-token-economics.html>
 pub struct TargetedFeeAdjustment<T, S, V, M, X>(sp_std::marker::PhantomData<(T, S, V, M, X)>);
 
 /// Something that can convert the current multiplier to the next one.

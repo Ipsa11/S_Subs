@@ -15,7 +15,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![deny(missing_docs)]
 
 use codec::{Decode, Encode, MaxEncodedLen};
 use frame_support::Parameter;
@@ -24,7 +23,6 @@ use sp_arithmetic::traits::AtLeast32BitUnsigned;
 use sp_core::RuntimeDebug;
 use sp_std::{fmt::Debug, vec::Vec};
 
-/// Index of a Polkadot Core.
 pub type CoreIndex = u16;
 
 /// A Task Id. In general this is called a ParachainId.
@@ -49,7 +47,6 @@ pub enum CoreAssignment {
 /// Type able to accept Coretime scheduling instructions and provide certain usage information.
 /// Generally implemented by the Relay-chain or some means of communicating with it.
 ///
-/// The trait representation of RFC#5 `<https://github.com/polkadot-fellows/RFCs/pull/5>`.
 pub trait CoretimeInterface {
 	/// A (Relay-chain-side) account ID.
 	type AccountId: Parameter;

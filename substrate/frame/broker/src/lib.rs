@@ -113,11 +113,10 @@ pub mod pallet {
 	#[pallet::storage]
 	pub type Configuration<T> = StorageValue<_, ConfigRecordOf<T>, OptionQuery>;
 
-	/// The Polkadot Core reservations (generally tasked with the maintenance of System Chains).
+
 	#[pallet::storage]
 	pub type Reservations<T> = StorageValue<_, ReservationsRecordOf<T>, ValueQuery>;
 
-	/// The Polkadot Core legacy leases.
 	#[pallet::storage]
 	pub type Leases<T> = StorageValue<_, LeasesRecordOf<T>, ValueQuery>;
 
@@ -364,8 +363,6 @@ pub mod pallet {
 			when: Timeslice,
 			/// The amount of privately contributed Coretime to the Instantaneous Coretime Pool.
 			private_pool_size: CoreMaskBitCount,
-			/// The amount of Coretime contributed to the Instantaneous Coretime Pool by the
-			/// Polkadot System.
 			system_pool_size: CoreMaskBitCount,
 		},
 		/// Some historical Instantaneous Core Pool payment record has been dropped.
@@ -387,7 +384,6 @@ pub mod pallet {
 		ClaimsReady {
 			/// The timeslice whose history is available.
 			when: Timeslice,
-			/// The amount of revenue the Polkadot System has already taken.
 			system_payout: BalanceOf<T>,
 			/// The total amount of revenue remaining to be claimed.
 			private_payout: BalanceOf<T>,

@@ -119,7 +119,7 @@ pub enum Command {
 	/// Produce a series of empty, consecutive blocks and execute them one-by-one.
 	///
 	/// To compare it with [`Command::FollowChain`]:
-	///  - we don't have the delay of the original blocktime (for Polkadot 6s), but instead, we
+	///  - we don't have the delay of the original blocktime, but instead, we
 	///    execute every block immediately
 	///  - the only data that will be put into blocks are pre-runtime digest items and inherent
 	///    extrinsics; both things should be defined in your node CLI handling level

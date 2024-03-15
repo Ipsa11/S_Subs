@@ -1,4 +1,3 @@
-//based on: https://polkadot.js.org/docs/api/examples/promise/transfer-events
 
 const assert = require("assert");
 
@@ -7,7 +6,7 @@ async function run(nodeName, networkInfo, args) {
   const api = await zombie.connect(wsUri, userDefinedTypes);
 
   // Construct the keyring after the API (crypto has an async init)
-  const keyring = new zombie.Keyring({ type: "sr25519" });
+  const keyring = new zombie.Keyring({ type: "sr25519" });s
 
   // Add Alice to our keyring with a hard-derivation path (empty phrase, so uses dev)
   const alice = keyring.addFromUri('//Alice');

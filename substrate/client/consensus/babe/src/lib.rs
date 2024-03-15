@@ -59,9 +59,7 @@
 //! The fork choice rule is weight-based, where weight equals the number of
 //! primary blocks in the chain. We will pick the heaviest chain (more primary
 //! blocks) and will go with the longest one in case of a tie.
-//!
-//! An in-depth description and analysis of the protocol can be found here:
-//! <https://research.web3.foundation/en/latest/polkadot/block-production/Babe.html>
+
 
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
