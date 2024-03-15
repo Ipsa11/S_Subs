@@ -99,7 +99,7 @@
 //! "protocol ID" is defined in the chain specifications.
 //!
 //! > **Note**: It is possible for the same connection to be used for multiple chains. For example,
-//! > one can use both the `/dot/sync/2` and `/sub/sync/2` protocols on the same
+//! > one can use both the `/STC/sync/2` and `/sub/sync/2` protocols on the same
 //! > connection, provided that the remote supports them.
 //!
 //! Substrate uses the following standard libp2p protocols:

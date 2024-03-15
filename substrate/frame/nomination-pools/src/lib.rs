@@ -182,24 +182,24 @@
 //!   claim all their pending rewards for them. This is not optional, and MUST happen for the reward
 //!   calculation to remain correct (see the documentation of `bond` as an example). So, make sure
 //!   you are warning your users about it. They might be surprised if they see that they bonded an
-//!   extra 100 DOTs, and now suddenly their 5.23 DOTs in pending reward is gone. It is not gone, it
+//!   extra 100 STC, and now suddenly their 5.23 STC in pending reward is gone. It is not gone, it
 //!   has been paid out to you!
 //! * Joining a pool implies transferring funds to the pool account. So it might be (based on which
 //!   wallet that you are using) that you no longer see the funds that are moved to the pool in your
 //!   “free balance” section. Make sure the user is aware of this, and not surprised by seeing this.
 //!   Also, the transfer that happens here is configured to to never accidentally destroy the sender
-//!   account. So to join a Pool, your sender account must remain alive with 1 DOT left in it. This
-//!   means, with 1 DOT as existential deposit, and 1 DOT as minimum to join a pool, you need at
-//!   least 2 DOT to join a pool. Consequently, if you are suggesting members to join a pool with
-//!   “Maximum possible value”, you must subtract 1 DOT to remain in the sender account to not
+//!   account. So to join a Pool, your sender account must remain alive with 1 STC left in it. This
+//!   means, with 1 STC as existential deposit, and 1 STC as minimum to join a pool, you need at
+//!   least 2 STC to join a pool. Consequently, if you are suggesting members to join a pool with
+//!   “Maximum possible value”, you must subtract 1 STC to remain in the sender account to not
 //!   accidentally kill it.
 //! * Points and balance are not the same! Any pool member, at any point in time, can have points in
 //!   either the bonded pool or any of the unbonding pools. The crucial fact is that in any of these
 //!   pools, the ratio of point to balance is different and might not be 1. Each pool starts with a
 //!   ratio of 1, but as time goes on, for reasons such as slashing, the ratio gets broken. Over
-//!   time, 100 points in a bonded pool can be worth 90 DOTs. Make sure you are either representing
-//!   points as points (not as DOTs), or even better, always display both: “You have x points in
-//!   pool y which is worth z DOTs”. See here and here for examples of how to calculate point to
+//!   time, 100 points in a bonded pool can be worth 90 STCs. Make sure you are either representing
+//!   points as points (not as STCs), or even better, always display both: “You have x points in
+//!   pool y which is worth z STCs”. See here and here for examples of how to calculate point to
 //!   balance ratio of each pool (it is almost trivial ;))
 //!
 //! ### Pool Management
@@ -1337,11 +1337,11 @@ impl<T: Config> RewardPool<T> {
 		// balance, and are thus below within the range of total_issuance. In the worse case
 		// scenario, for `saturating_from_rational`, we have:
 		//
-		// dot_total_issuance * 10^18 / `minJoinBond`
+		// STC_total_issuance * 10^18 / `minJoinBond`
 		//
 		// assuming `MinJoinBond == ED`
 		//
-		// dot_total_issuance * 10^18 / 10^10 = dot_total_issuance * 10^8
+		// STC_total_issuance * 10^18 / 10^10 = STC_total_issuance * 10^18
 		//
 		// which, with the current numbers, is a miniscule fraction of the u128 capacity.
 		//

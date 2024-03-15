@@ -671,7 +671,7 @@ impl pallet_staking::Config for Runtime {
 	type EventListeners = NominationPools;
 	type WeightInfo = pallet_staking::weights::SubstrateWeight<Runtime>;
 	type BenchmarkingConfig = StakingBenchmarkingConfig;
-	type RewardDistribute = Reward;
+	type RewardDistribution = Reward;
 }
 impl pallet_reward::Config for Runtime{
 

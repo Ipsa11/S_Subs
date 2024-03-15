@@ -69,7 +69,7 @@ pub fn display_and_check_bags<Runtime: RuntimeT<Instance1>>(
 			.try_into()
 			.map_err(|_| "runtime must configure score to at most u64 to use this test")
 			.unwrap();
-		// threshold in terms of UNITS (e.g. KSM, DOT etc)
+		// threshold in terms of UNITS (e.g. STC etc)
 		let vote_weight_thresh_as_unit = vote_weight_thresh_u64 as f64 / currency_unit as f64;
 		let pretty_thresh = format!("Threshold: {}. {}", vote_weight_thresh_as_unit, currency_name);
 

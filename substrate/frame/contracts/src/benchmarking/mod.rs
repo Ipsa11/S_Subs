@@ -2670,8 +2670,8 @@ benchmarks! {
 		let data = {
 			let new: ([u8; 4], &str, &str, [u8; 32], AccountIdOf<T>) = (
 				[0xa6, 0xf1, 0xf5, 0xe1],
-				"KSM",
-				"K",
+				"STC",
+				"S",
 				balance,
 				caller.clone(),
 			);

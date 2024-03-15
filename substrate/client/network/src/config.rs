@@ -64,7 +64,7 @@ pub use libp2p::{
 };
 
 /// Protocol name prefix, transmitted on the wire for legacy protocol names.
-/// I.e., `dot` in `/dot/sync/2`. Should be unique for each chain. Always UTF-8.
+/// I.e., `STC` in `/STC/sync/2`. Should be unique for each chain. Always UTF-8.
 /// Deprecated in favour of genesis hash & fork ID based protocol names.
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct ProtocolId(smallvec::SmallVec<[u8; 6]>);

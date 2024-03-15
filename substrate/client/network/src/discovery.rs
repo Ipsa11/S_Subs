@@ -982,7 +982,7 @@ mod tests {
 
 		let genesis_hash = H256::from_low_u64_be(1);
 		let fork_id = Some("test-fork-id");
-		let protocol_id = ProtocolId::from("dot");
+		let protocol_id = ProtocolId::from("STC");
 
 		// Build swarms whose behaviour is `DiscoveryBehaviour`, each aware of
 		// the first swarm via `with_permanent_addresses`.

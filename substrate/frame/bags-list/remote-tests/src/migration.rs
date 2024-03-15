@@ -8,7 +8,7 @@ use remote_externalities::{Builder, Mode, OnlineConfig};
 use sp_runtime::{traits::Block as BlockT, DeserializeOwned};
 
 /// Test voter bags migration. `currency_unit` is the number of planks per the the runtimes `UNITS`
-/// (i.e. number of decimal places per DOT, KSM etc)
+/// (i.e. number of decimal places per STC etc)
 pub async fn execute<Runtime, Block>(
 	currency_unit: u64,
 	currency_name: &'static str,

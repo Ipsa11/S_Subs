@@ -329,7 +329,7 @@ impl CliConfiguration for RunCmd {
 						"http://127.0.0.1:*".into(),
 						"https://localhost:*".into(),
 						"https://127.0.0.1:*".into(),
-						"https://polkadot.js.org".into(),
+						"https://saitascan.io".into(),
 					])
 				}
 			})

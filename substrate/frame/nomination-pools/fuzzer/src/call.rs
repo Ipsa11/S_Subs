@@ -216,8 +216,8 @@ fn main() {
 	let mut ok = 0;
 	let mut err = 0;
 
-	let dot: Balance = (10 as Balance).pow(10);
-	ExistentialDeposit::set(dot);
+	let stc: Balance = (10 as Balance).pow(10);
+	ExistentialDeposit::set(stc);
 	BondingDuration::set(8);
 
 	ext.execute_with(|| {

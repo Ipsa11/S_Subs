@@ -95,17 +95,17 @@
 /// graph LR
 /// 	Bag0 --> Bag1 --> Bag2
 ///
-/// 	subgraph Bag0[Bag 0: 21-30 DOT]
+/// 	subgraph Bag0[Bag 0: 21-30 STC]
 /// 		direction LR
 /// 		25 --> 21 --> 22X[22]
 /// 	end
 ///
-/// 	subgraph Bag1[Bag 1: 11-20 DOT]
+/// 	subgraph Bag1[Bag 1: 11-20 STC]
 /// 		direction LR
 /// 		12 --> 22
 /// 	end
 ///
-/// 	subgraph Bag2[Bag 2: 0-10 DOT]
+/// 	subgraph Bag2[Bag 2: 0-10 STC]
 /// 		direction LR
 /// 		5 --> 7 --> 3
 /// 	end

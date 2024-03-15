@@ -8,6 +8,7 @@ license.workspace = true
 [dependencies]
 frame-support = { path = "../../frame/support", default-features = false }
 pallet-staking = { path = "../../frame/staking", default-features = false }
+pallet-session = { path = "../../frame/session", default-features = false }
 pallet-treasury = { path = "../../frame/treasury", default-features = false }
 frame-system = { path = "../../frame/system", default-features = false }
 sp-staking = { path = "../../primitives/staking",default-features = false}
@@ -27,7 +28,7 @@ pallet-balances = { path = "../../frame/balances" }
 [features]
 default = ["std"]
 std = ["parity-scale-codec/std", "scale-info/std","sp-staking/std",
- "sp-runtime/std","pallet-staking/std","pallet-treasury/std",
+ "sp-runtime/std","pallet-staking/std","pallet-treasury/std","pallet-session/std",
  "pallet-balances/std","frame-election-provider-support/std",
   "frame-support/std", "frame-system/std"]
 

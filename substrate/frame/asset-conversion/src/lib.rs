@@ -37,8 +37,8 @@
 //!
 //! The `quote_price_exact_tokens_for_tokens` and `quote_price_tokens_for_exact_tokens` functions
 //! both take a path parameter of the route to take. If you want to swap from native asset to
-//! non-native asset 1, you would pass in a path of `[DOT, 1]` or `[1, DOT]`. If you want to swap
-//! from non-native asset 1 to non-native asset 2, you would pass in a path of `[1, DOT, 2]`.
+//! non-native asset 1, you would pass in a path of `[STC, 1]` or `[1, STC]`. If you want to swap
+//! from non-native asset 1 to non-native asset 2, you would pass in a path of `[1, STC, 2]`.
 //!
 //! (For an example of configuring this pallet to use `MultiLocation` as an asset id, see the
 //! cumulus repo).
@@ -284,7 +284,7 @@ pub mod pallet {
 			/// The account that the assets were transferred to.
 			send_to: T::AccountId,
 			/// The route of asset ids that the swap went through.
-			/// E.g. A -> Dot -> B
+			/// E.g. A -> STC -> B
 			path: BoundedVec<T::MultiAssetId, T::MaxSwapPathLength>,
 			/// The amount of the first asset that was swapped.
 			amount_in: T::AssetBalance,

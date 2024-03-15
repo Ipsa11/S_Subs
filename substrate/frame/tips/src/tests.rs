@@ -219,16 +219,16 @@ fn genesis_config_works() {
 }
 
 fn tip_hash() -> H256 {
-	BlakeTwo256::hash_of(&(BlakeTwo256::hash(b"awesome.dot"), 3u128))
+	BlakeTwo256::hash_of(&(BlakeTwo256::hash(b"awesome.stc"), 3u128))
 }
 
 #[test]
 fn tip_new_cannot_be_used_twice() {
 	new_test_ext().execute_with(|| {
 		Balances::make_free_balance_be(&Treasury::account_id(), 101);
-		assert_ok!(Tips::tip_new(RuntimeOrigin::signed(10), b"awesome.dot".to_vec(), 3, 10));
+		assert_ok!(Tips::tip_new(RuntimeOrigin::signed(10), b"awesome.stc".to_vec(), 3, 10));
 		assert_noop!(
-			Tips::tip_new(RuntimeOrigin::signed(11), b"awesome.dot".to_vec(), 3, 10),
+			Tips::tip_new(RuntimeOrigin::signed(11), b"awesome.stc".to_vec(), 3, 10),
 			Error::<Test>::AlreadyKnown
 		);
 	});
@@ -238,13 +238,13 @@ fn tip_new_cannot_be_used_twice() {
 fn report_awesome_and_tip_works() {
 	new_test_ext().execute_with(|| {
 		Balances::make_free_balance_be(&Treasury::account_id(), 101);
-		assert_ok!(Tips::report_awesome(RuntimeOrigin::signed(0), b"awesome.dot".to_vec(), 3));
+		assert_ok!(Tips::report_awesome(RuntimeOrigin::signed(0), b"awesome.stc".to_vec(), 3));
 		assert_eq!(Balances::reserved_balance(0), 12);
 		assert_eq!(Balances::free_balance(0), 88);
 
 		// other reports don't count.
 		assert_noop!(
-			Tips::report_awesome(RuntimeOrigin::signed(1), b"awesome.dot".to_vec(), 3),
+			Tips::report_awesome(RuntimeOrigin::signed(1), b"awesome.stc".to_vec(), 3),
 			Error::<Test>::AlreadyKnown
 		);
 
@@ -265,10 +265,10 @@ fn report_awesome_and_tip_works() {
 fn report_awesome_from_beneficiary_and_tip_works() {
 	new_test_ext().execute_with(|| {
 		Balances::make_free_balance_be(&Treasury::account_id(), 101);
-		assert_ok!(Tips::report_awesome(RuntimeOrigin::signed(0), b"awesome.dot".to_vec(), 0));
+		assert_ok!(Tips::report_awesome(RuntimeOrigin::signed(0), b"awesome.stc".to_vec(), 0));
 		assert_eq!(Balances::reserved_balance(0), 12);
 		assert_eq!(Balances::free_balance(0), 88);
-		let h = BlakeTwo256::hash_of(&(BlakeTwo256::hash(b"awesome.dot"), 0u128));
+		let h = BlakeTwo256::hash_of(&(BlakeTwo256::hash(b"awesome.stc"), 0u128));
 		assert_ok!(Tips::tip(RuntimeOrigin::signed(10), h, 10));
 		assert_ok!(Tips::tip(RuntimeOrigin::signed(11), h, 10));
 		assert_ok!(Tips::tip(RuntimeOrigin::signed(12), h, 10));
@@ -287,7 +287,7 @@ fn close_tip_works() {
 		Balances::make_free_balance_be(&Treasury::account_id(), 101);
 		assert_eq!(Treasury::pot(), 100);
 
-		assert_ok!(Tips::tip_new(RuntimeOrigin::signed(10), b"awesome.dot".to_vec(), 3, 10));
+		assert_ok!(Tips::tip_new(RuntimeOrigin::signed(10), b"awesome.stc".to_vec(), 3, 10));
 
 		let h = tip_hash();
 
@@ -327,7 +327,7 @@ fn slash_tip_works() {
 		assert_eq!(Balances::reserved_balance(0), 0);
 		assert_eq!(Balances::free_balance(0), 100);
 
-		assert_ok!(Tips::report_awesome(RuntimeOrigin::signed(0), b"awesome.dot".to_vec(), 3));
+		assert_ok!(Tips::report_awesome(RuntimeOrigin::signed(0), b"awesome.stc".to_vec(), 3));
 
 		assert_eq!(Balances::reserved_balance(0), 12);
 		assert_eq!(Balances::free_balance(0), 88);
@@ -353,7 +353,7 @@ fn retract_tip_works() {
 	new_test_ext().execute_with(|| {
 		// with report awesome
 		Balances::make_free_balance_be(&Treasury::account_id(), 101);
-		assert_ok!(Tips::report_awesome(RuntimeOrigin::signed(0), b"awesome.dot".to_vec(), 3));
+		assert_ok!(Tips::report_awesome(RuntimeOrigin::signed(0), b"awesome.stc".to_vec(), 3));
 		let h = tip_hash();
 		assert_ok!(Tips::tip(RuntimeOrigin::signed(10), h, 10));
 		assert_ok!(Tips::tip(RuntimeOrigin::signed(11), h, 10));
@@ -368,7 +368,7 @@ fn retract_tip_works() {
 
 		// with tip new
 		Balances::make_free_balance_be(&Treasury::account_id(), 101);
-		assert_ok!(Tips::tip_new(RuntimeOrigin::signed(10), b"awesome.dot".to_vec(), 3, 10));
+		assert_ok!(Tips::tip_new(RuntimeOrigin::signed(10), b"awesome.stc".to_vec(), 3, 10));
 		let h = tip_hash();
 		assert_ok!(Tips::tip(RuntimeOrigin::signed(11), h, 10));
 		assert_ok!(Tips::tip(RuntimeOrigin::signed(12), h, 10));
@@ -386,7 +386,7 @@ fn retract_tip_works() {
 fn tip_median_calculation_works() {
 	new_test_ext().execute_with(|| {
 		Balances::make_free_balance_be(&Treasury::account_id(), 101);
-		assert_ok!(Tips::tip_new(RuntimeOrigin::signed(10), b"awesome.dot".to_vec(), 3, 0));
+		assert_ok!(Tips::tip_new(RuntimeOrigin::signed(10), b"awesome.stc".to_vec(), 3, 0));
 		let h = tip_hash();
 		assert_ok!(Tips::tip(RuntimeOrigin::signed(11), h, 10));
 		assert_ok!(Tips::tip(RuntimeOrigin::signed(12), h, 1000000));
@@ -400,7 +400,7 @@ fn tip_median_calculation_works() {
 fn tip_changing_works() {
 	new_test_ext().execute_with(|| {
 		Balances::make_free_balance_be(&Treasury::account_id(), 101);
-		assert_ok!(Tips::tip_new(RuntimeOrigin::signed(10), b"awesome.dot".to_vec(), 3, 10000));
+		assert_ok!(Tips::tip_new(RuntimeOrigin::signed(10), b"awesome.stc".to_vec(), 3, 10000));
 		let h = tip_hash();
 		assert_ok!(Tips::tip(RuntimeOrigin::signed(11), h, 10000));
 		assert_ok!(Tips::tip(RuntimeOrigin::signed(12), h, 10000));
@@ -589,14 +589,14 @@ fn report_awesome_and_tip_works_second_instance() {
 		assert_eq!(Balances::free_balance(&Treasury::account_id()), 101);
 		assert_eq!(Balances::free_balance(&Treasury1::account_id()), 201);
 
-		assert_ok!(Tips1::report_awesome(RuntimeOrigin::signed(0), b"awesome.dot".to_vec(), 3));
+		assert_ok!(Tips1::report_awesome(RuntimeOrigin::signed(0), b"awesome.stc".to_vec(), 3));
 		// duplicate report in tips1 reports don't count.
 		assert_noop!(
-			Tips1::report_awesome(RuntimeOrigin::signed(1), b"awesome.dot".to_vec(), 3),
+			Tips1::report_awesome(RuntimeOrigin::signed(1), b"awesome.stc".to_vec(), 3),
 			Error::<Test, Instance1>::AlreadyKnown
 		);
 		// but tips is separate
-		assert_ok!(Tips::report_awesome(RuntimeOrigin::signed(0), b"awesome.dot".to_vec(), 3));
+		assert_ok!(Tips::report_awesome(RuntimeOrigin::signed(0), b"awesome.stc".to_vec(), 3));
 
 		let h = tip_hash();
 		assert_ok!(Tips1::tip(RuntimeOrigin::signed(10), h, 10));

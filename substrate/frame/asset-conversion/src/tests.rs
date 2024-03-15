@@ -650,10 +650,10 @@ fn can_swap_with_native() {
 fn can_swap_with_realistic_values() {
 	new_test_ext().execute_with(|| {
 		let user = 1;
-		let dot = NativeOrAssetId::Native;
+		let stc = NativeOrAssetId::Native;
 		let usd = NativeOrAssetId::Asset(2);
 		create_tokens(user, vec![usd]);
-		assert_ok!(AssetConversion::create_pool(RuntimeOrigin::signed(user), dot, usd));
+		assert_ok!(AssetConversion::create_pool(RuntimeOrigin::signed(user), stc, usd));
 
 		const UNIT: u128 = 1_000_000_000;
 
@@ -664,7 +664,7 @@ fn can_swap_with_realistic_values() {
 		let liquidity_usd = 1_000_000 * UNIT;
 		assert_ok!(AssetConversion::add_liquidity(
 			RuntimeOrigin::signed(user),
-			dot,
+			stc,
 			usd,
 			liquidity_dot,
 			liquidity_usd,
@@ -677,7 +677,7 @@ fn can_swap_with_realistic_values() {
 
 		assert_ok!(AssetConversion::swap_exact_tokens_for_tokens(
 			RuntimeOrigin::signed(user),
-			bvec![usd, dot],
+			bvec![usd, stc],
 			input_amount,
 			1,
 			user,
@@ -687,9 +687,9 @@ fn can_swap_with_realistic_values() {
 		assert!(events().contains(&Event::<Test>::SwapExecuted {
 			who: user,
 			send_to: user,
-			path: bvec![usd, dot],
+			path: bvec![usd, stc],
 			amount_in: 10 * UNIT,      // usd
-			amount_out: 1_993_980_120, // About 2 dot after div by UNIT.
+			amount_out: 1_993_980_120, // About 2 stc after div by UNIT.
 		}));
 	});
 }

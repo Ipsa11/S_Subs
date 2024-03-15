@@ -31,7 +31,7 @@ use frame_support::{
 	weights::Weight,
 	BoundedVec,
 };
-use frame_support::traits::reward::RewardAccount;
+use frame_support::traits::reward::Rewards;
 use frame_system::{ensure_root, ensure_signed, pallet_prelude::*};
 use sp_runtime::{
 	traits::{CheckedSub, SaturatedConversion, StaticLookup, Zero},
@@ -92,7 +92,7 @@ pub mod pallet {
 			Balance = Self::CurrencyBalance,
 		>;
 
-		type RewardDistribute : RewardAccount<Self::AccountId>;
+		type RewardDistribution : Rewards<Self::AccountId>;
 
 		/// Just the `Currency::Balance` type; we have this item to allow us to constrain it to
 		/// `From<u64>`.

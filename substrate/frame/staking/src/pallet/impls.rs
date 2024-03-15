@@ -37,7 +37,7 @@ use sp_runtime::{
 	traits::{Bounded, Convert, One, SaturatedConversion, Saturating, StaticLookup, Zero},
 	Perbill,
 };
-use frame_support::traits::reward::RewardAccount;
+use frame_support::traits::reward::Rewards;
 use sp_staking::{
 	currency_to_vote::CurrencyToVote,
 	offence::{DisableStrategy, OffenceDetails, OnOffenceHandler},
@@ -298,9 +298,9 @@ impl<T: Config> Pallet<T> {
 			let (validator_payout, remainder) =
 				T::EraPayout::era_payout(staked, issuance, era_duration);
 
-			let reward = T::RewardDistribute::reward_account();
+			let reward = T::RewardDistribution::reward_account();
 			for i in reward{
-				let _ = T::RewardDistribute::claim_rewards(i);
+				let _ = T::RewardDistribution::claim_rewards(i);
 			}
 
 			// Set ending era reward.

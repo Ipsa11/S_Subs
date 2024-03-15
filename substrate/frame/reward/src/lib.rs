@@ -6,7 +6,7 @@
 use frame_support::pallet_prelude::DispatchResult;
 use frame_support::ensure;
 pub use pallet::*;
-use pallet_staking::{ CurrentEra, IndividualExposure, ErasStakers };
+use pallet_staking::{ CurrentEra, ErasRewardPoints, ErasStakers, IndividualExposure };
 use pallet_treasury::TreasuryAccountId;
 use sp_runtime::traits::AtLeast32BitUnsigned;
 use parity_scale_codec::Codec;
@@ -17,7 +17,7 @@ use frame_support::traits::{
 	LockableCurrency,
 	RewardAvailable,
 	ValidatorSet,
-	reward::RewardAccount,
+	reward::Rewards,
 	ExistenceRequirement,
 	ExistenceRequirement::KeepAlive,
 };
@@ -44,10 +44,15 @@ pub mod pallet {
 	pub trait Config: frame_system::Config + pallet_staking::Config {
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 		type ValidatorSet: frame_support::traits::ValidatorSetWithIdentification<Self::AccountId>;
+		// type Validators: frame_support::traits::ValidatorSet<Self::AccountId>;
 		type DataProvider: ElectionDataProvider<
 			AccountId = <Self::ValidatorSet as ValidatorSet<Self::AccountId>>::ValidatorId,
 			BlockNumber = BlockNumberFor<Self>
 		>;
+		// type ConvertValidator: Convert<
+		// 	<<Self as Config>::Validators as ValidatorSet<<Self as frame_system::Config>::AccountId>>::ValidatorId,
+		// 	Self::AccountId,
+		// >;
 		type ValidatorIdOf: Convert<
 			Self::AccountId,
 			Option<<<Self as Config>::ValidatorSet as ValidatorSet<<Self as frame_system::Config>::AccountId>>::ValidatorId>
@@ -219,7 +224,7 @@ impl<T: Config> RewardAvailable<T::Balance> for Pallet<T> {
 	}
 }
 
-impl<T: Config> RewardAccount<T::AccountId> for Pallet<T> {
+impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 	fn reward_account() -> Vec<T::AccountId> {
 		let account = EraRewardsVault::<T>::get().unwrap_or_else(Vec::new);
 		account
@@ -255,6 +260,19 @@ impl<T: Config> RewardAccount<T::AccountId> for Pallet<T> {
 		Self::recalculate_rewarded_accounts(who.clone())?;
 		return Ok(());
 	}
+
+	// fn calculate_reward() {
+	// 	let current_era = CurrentEra::<T>::get().unwrap_or(0);
+	// 	let all_validators = T::Validators::validators();
+
+	// 	all_validators.iter().for_each(|validator| {
+	// 		let convert = T::ConvertValidator::convert(validator.clone());
+	// 		let era_points = ErasRewardPoints::<T>::get(current_era);
+	// 		let particular_validator_point = era_points.individual.get(&convert);
+	// 	})
+		
+		
+	// }
 
 }
 

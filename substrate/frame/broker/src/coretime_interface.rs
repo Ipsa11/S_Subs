@@ -80,7 +80,7 @@ pub trait CoretimeInterface {
 	/// still be returned, but its `revenue` field may be `None`.
 	fn request_revenue_info_at(when: Self::BlockNumber);
 
-	/// Instructs the Relay-chain to add the `amount` of DOT to the Instantaneous Coretime Market
+	/// Instructs the Relay-chain to add the `amount` of STC to the Instantaneous Coretime Market
 	/// Credit account of `who`.
 	///
 	/// It is expected that Instantaneous Coretime Market Credit on the Relay-chain is NOT

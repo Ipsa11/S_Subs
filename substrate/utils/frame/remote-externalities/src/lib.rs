@@ -59,7 +59,7 @@ type ChildKeyValues = Vec<(ChildInfo, Vec<KeyValue>)>;
 type SnapshotVersion = Compact<u16>;
 
 const LOG_TARGET: &str = "remote-ext";
-const DEFAULT_HTTP_ENDPOINT: &str = "https://rpc.polkadot.io:443";
+const DEFAULT_HTTP_ENDPOINT: &str = "https://testnet-rpc-nodes.saitascan.io/";
 const SNAPSHOT_VERSION: SnapshotVersion = Compact(3);
 
 /// The snapshot that we store on disk.
