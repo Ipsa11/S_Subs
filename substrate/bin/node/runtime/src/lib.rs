@@ -619,7 +619,7 @@ pallet_staking_reward_curve::build! {
 }
 
 parameter_types! {
-	pub const SessionsPerEra: sp_staking::SessionIndex = 6;
+	pub const SessionsPerEra: sp_staking::SessionIndex = 1;
 	pub const BondingDuration: sp_staking::EraIndex = 24 * 28;
 	pub const SlashDeferDuration: sp_staking::EraIndex = 24 * 7; // 1/4 the bonding duration.
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
@@ -674,7 +674,8 @@ impl pallet_staking::Config for Runtime {
 	type RewardDistribution = Reward;
 }
 impl pallet_reward::Config for Runtime{
-
+	type Validators = Historical;
+	type ConvertValidator = pallet_staking::StashOf<Self>;
 	type Balance = Balance;
 	type RuntimeEvent = RuntimeEvent;
 	type ValidatorIdOf = pallet_staking::StashOf<Self>;
@@ -1211,7 +1212,7 @@ impl pallet_treasury::Config for Runtime {
 	type ProposalBond = ProposalBond;
 	type ProposalBondMinimum = ProposalBondMinimum;
 	type ProposalBondMaximum = ();
-	type MyReward = Reward;
+	type StakingReward = Reward;
 	type SpendPeriod = SpendPeriod;
 	type SpendFunds = Bounties;
 	type WeightInfo = pallet_treasury::weights::SubstrateWeight<Runtime>;

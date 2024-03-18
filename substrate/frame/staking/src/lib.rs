@@ -371,8 +371,7 @@ pub struct ActiveEraInfo {
 
 /// Reward points of an era. Used to split era total payout between validators.
 ///
-/// This points will be used to reward validators and their respective nominators.
-#[derive(PartialEq, Encode, Decode, RuntimeDebug, TypeInfo)]
+#[derive(PartialEq, Encode, core::fmt::Debug,Decode, TypeInfo)]
 pub struct EraRewardPoints<AccountId: Ord> {
 	/// Total number of points. Equals the sum of reward points for each validator.
 	pub total: RewardPoint,
@@ -384,6 +383,23 @@ impl<AccountId: Ord> Default for EraRewardPoints<AccountId> {
 	fn default() -> Self {
 		EraRewardPoints { total: Default::default(), individual: BTreeMap::new() }
 	}
+}
+
+impl<AccountId: Ord> sp_std::fmt::Display for EraRewardPoints<AccountId> where
+AccountId: Ord,
+AccountId: sp_std::fmt::Debug,  {
+    fn fmt(&self, f: &mut sp_std::fmt::Formatter<'_>) -> sp_std::fmt::Result {
+        // Write the total points
+        write!(f, "Total points: {}\n", self.total)?;
+
+        // Write each validator's points
+        for (validator, points) in &self.individual {
+			let validator_str = scale_info::prelude::format!("{:?}", validator);
+            write!(f, "Validator {:#?}: Points {}\n", validator_str, points)?;
+        }
+
+        Ok(())
+    }
 }
 
 /// A destination account for payment.

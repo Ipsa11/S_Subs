@@ -176,7 +176,7 @@ pub mod pallet {
 		#[pallet::constant]
 		type SpendPeriod: Get<BlockNumberFor<Self>>;
 
-		type MyReward : RewardAvailable<BalanceOf<Self, I>>;
+		type StakingReward : RewardAvailable<BalanceOf<Self, I>>;
 
 		/// The treasury's pallet id, used for deriving its sovereign account ID.
 		#[pallet::constant]
@@ -326,7 +326,7 @@ pub mod pallet {
 		fn on_finalize(_n: frame_system::pallet_prelude::BlockNumberFor<T>)	{
 			let account_balance = T::Currency::free_balance(&Self::account_id());
 			TreasuryBalance::<T,I>::insert(&Self::account_id(),account_balance);
-			let total_reward = T::MyReward::reward_available();
+			let total_reward = T::StakingReward::reward_available();
 			let available = account_balance - total_reward;
 			AvailableBalance::<T, I>::mutate(|balance| {	*balance = Some(available);	});
 			
@@ -448,7 +448,7 @@ pub mod pallet {
 			let max_amount = T::SpendOrigin::ensure_origin(origin)?;
 			ensure!(amount <= max_amount, Error::<T, I>::InsufficientPermission);
 			let available_balance = AvailableBalance::<T,I>::get().unwrap();
-			ensure!(amount <= available_balance, Error::<T, I>::InsufficientPermission);
+			ensure!(amount < available_balance, Error::<T, I>::InsufficientPermission);
 			
 	
 
