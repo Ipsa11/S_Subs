@@ -170,7 +170,6 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 	}
 	fn claim_rewards(account: T::AccountId) -> DispatchResult {
 		let reward = EraRewardAccounts::<T>::get(account.clone()).unwrap_or(0);
-		log::info!("here is the reward {}",reward);
 		let nominators = Self::check_nominators(account.clone());
 		if nominators.is_empty() {
 			Self::distribute_reward(account.clone())?;
@@ -203,8 +202,8 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 			let total_reward = reward as f64 * (*validator_points as f64);
 			if nominators.is_empty() {
 				let converted_reward = Self::convert_f64_to_u128(total_reward);
-				log::info!("here is the converted_reward{}",converted_reward);
 				let _ = Self::add_reward(validator.clone(), converted_reward);
+				return;
 			}
 			let validator_prefs = Validators::<T>::get(validator.clone());
 			let validator_commission = validator_prefs.commission.deconstruct() as f64;
@@ -302,14 +301,12 @@ impl<T: Config> Pallet<T> {
 
 	fn distribute_reward(account: T::AccountId) -> DispatchResult {
 		let reward = EraRewardAccounts::<T>::get(account.clone()).unwrap_or(0);
-		log::info!("here is the reward {}",reward);
 		Self::transfer(
 			Self::treasury_account(),
 			account.clone(),
 			reward.into(),
 			KeepAlive
 		)?;
-		log::info!("here is the transferred");
 		EraRewardAccounts::<T>::remove(account.clone());
 		BeneficialRewardRecord::<T>::insert(account.clone(), reward);
 		Ok(())
