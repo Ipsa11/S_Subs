@@ -675,7 +675,7 @@ impl pallet_staking::Config for Runtime {
 }
 impl pallet_reward::Config for Runtime{
 	type Validators = Historical;
-	type ConvertValidator = pallet_staking::StashOf<Self>;
+	type ValidatorId = pallet_staking::StashOf<Self>;
 	type Balance = Balance;
 	type RuntimeEvent = RuntimeEvent;
 	type ValidatorIdOf = pallet_staking::StashOf<Self>;

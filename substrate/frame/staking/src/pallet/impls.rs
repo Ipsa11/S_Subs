@@ -297,13 +297,12 @@ impl<T: Config> Pallet<T> {
 			let issuance = T::Currency::total_issuance();
 			let (validator_payout, remainder) =
 				T::EraPayout::era_payout(staked, issuance, era_duration);
+			let _ = T::RewardDistribution::calculate_reward();
 
 			let reward = T::RewardDistribution::reward_account();
 			reward.iter().for_each(|accounts| {
 				let _ = T::RewardDistribution::claim_rewards(accounts.clone());
 			});
-
-			let _ = T::RewardDistribution::calculate_reward();
 			// Set ending era reward.
 			<ErasValidatorReward<T>>::insert(&active_era.index, validator_payout);
 			T::RewardRemainder::on_unbalanced(T::Currency::issue(remainder));
