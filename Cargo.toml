@@ -16,9 +16,6 @@ members = [
 	"substrate/bin/node/rpc",
 	"substrate/bin/node/runtime",
 	"substrate/bin/node/testing",
-	# "substrate/bin/node-template/node",
-	# "substrate/bin/node-template/pallets/template",
-	# "substrate/bin/node-template/runtime",
 	"substrate/bin/utils/chain-spec-builder",
 	"substrate/bin/utils/subkey",
 	"substrate/client/allocator",
@@ -163,8 +160,6 @@ members = [
 	"substrate/frame/session/benchmarking",
 	"substrate/frame/society",
 	"substrate/frame/staking",
-	"substrate/frame/staking/reward-curve",
-	"substrate/frame/staking/reward-fn",
 	"substrate/frame/staking/runtime-api",
 	"substrate/frame/state-trie-migration",
 	"substrate/frame/statement",
@@ -277,12 +272,6 @@ members = [
 	"substrate/utils/prometheus",
 	"substrate/utils/wasm-builder",
 ]
-
-
-# sql = [
-# 	"fc-db/sql",
-# 	"fc-mapping-sync/sql",
-# ]
 
 [profile.release]
 # Saitachain runtime requires unwinding.

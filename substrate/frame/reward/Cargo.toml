@@ -17,6 +17,7 @@ scale-info = { version = "2.5.0", default-features = false, features = ["derive"
 parity-scale-codec = { version = "3.6.1", default-features = false, features = [ "derive" ] }
 frame-benchmarking = { version = "4.0.0-dev", default-features = false, optional = true, path = "../../frame/benchmarking" }
 frame-election-provider-support = { version = "4.0.0-dev", default-features = false, path = "../election-provider-support" } 
+log = "0.4.21"
 
 [dev-dependencies]
 pallet-timestamp = { path = "../../frame/timestamp"}
