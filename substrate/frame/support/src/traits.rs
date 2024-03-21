@@ -116,7 +116,6 @@ pub use messages::{
 	TransformOrigin,
 };
 pub mod reward;
-pub use reward::RewardAvailable;
 mod safe_mode;
 pub use safe_mode::{SafeMode, SafeModeError, SafeModeNotify};
 

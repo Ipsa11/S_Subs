@@ -26,12 +26,11 @@ use frame_support::{
 	traits::{
 		Currency, Defensive, DefensiveResult, DefensiveSaturating, EnsureOrigin,
 		EstimateNextNewSession, Get, LockIdentifier, LockableCurrency, OnUnbalanced, TryCollect,
-		UnixTime,
+		UnixTime,reward::Rewards
 	},
 	weights::Weight,
 	BoundedVec,
 };
-use frame_support::traits::reward::Rewards;
 use frame_system::{ensure_root, ensure_signed, pallet_prelude::*};
 use sp_runtime::{
 	traits::{CheckedSub, SaturatedConversion, StaticLookup, Zero},
@@ -92,6 +91,7 @@ pub mod pallet {
 			Balance = Self::CurrencyBalance,
 		>;
 
+		/// The reward distribution for validator and nominator
 		type RewardDistribution : Rewards<Self::AccountId>;
 
 		/// Just the `Currency::Balance` type; we have this item to allow us to constrain it to
