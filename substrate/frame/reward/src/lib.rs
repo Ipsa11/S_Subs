@@ -173,8 +173,9 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 		all_validators.iter().for_each(|validator_id| {
 			let validator = T::ValidatorId::convert(validator_id.clone()).unwrap();
 			let validator_points = Self::get_validator_point(validator.clone());
-			let era_reward: u128 = 36597;
+			let era_reward: u128 = 2;
 			let reward = Self::calculate_validator_reward(validator_points.into(), era_reward);
+			log::info!("reward {}",reward);
 			let nominators = Self::check_nominators(validator.clone());
 			if nominators.is_empty() {
 				Self::add_reward(validator.clone(), reward);
@@ -183,19 +184,24 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 
 			let validator_prefs = Validators::<T>::get(validator.clone());
 			let validator_commission = validator_prefs.commission.deconstruct() as u128;
+			log::info!(" the validator_commission{}",validator_commission);
 			let nominator_share = (reward * validator_commission) / 100;
+			log::info!("the nominator_share{}",nominator_share);
 			let validator_share = reward - nominator_share;
+			log::info!(" the nominator_share{}",validator_share);
 			Self::add_reward(validator.clone(), validator_share);
 
 			nominators.iter().for_each(|nominator| {
 				let nominator_stake = nominator.value;
 				let exposure = ErasStakers::<T>::get(Self::current_era(), validator.clone());
 				let total_stake = exposure.total;
+				log::info!(" total_stake{:?}",total_stake);
 				let nominator_reward = Self::calculate_nominator_reward(
 					nominator_stake.into(),
 					total_stake.into(),
 					nominator_share
 				);
+				log::info!(" nominator_reward{}",nominator_reward);
 				// let converted_reward = Self::convert_f64_to_u128(nominator_reward);
 				Self::add_reward(nominator.who.clone(), nominator_reward);
 			});
@@ -211,6 +217,8 @@ impl<T: Config> Pallet<T> {
 		amount: T::Balance,
 		existence_requirement: ExistenceRequirement
 	) -> DispatchResult {
+		// 0.000000000004
+		log::info!("here is the amount in transfer{:?}",amount);
 		// let precision = 10;
 		// let scale_amount = amount * (10u128).pow(precision).into();
 		T::RewardCurrency::transfer(&who, &dest, amount, existence_requirement)?;
@@ -245,7 +253,9 @@ impl<T: Config> Pallet<T> {
 		Ok(())
 	}
 	pub fn calculate_nominator_reward(share: u128, total_stake: u128, reward: u128) -> u128 {
+		log::info!("the share {},total_stake{},reward {} of calculate_nominator_reward  ",share,total_stake,reward);
 		let scaled_share = (share / total_stake) * reward;
+		log::info!("scaled_share {} of calculate_nominator_reward  ",scaled_share);
 		scaled_share
 	}
 
@@ -267,8 +277,11 @@ impl<T: Config> Pallet<T> {
 	}
 
 	fn add_reward(account: T::AccountId, reward: u128) {
+		log::info!("account and reward of the add_reward function {:?},{}",account,reward);
 		let earlier_reward = EraRewardAccounts::<T>::get(account.clone()).unwrap_or(0);
+		log::info!("earlier_reward,{}",earlier_reward);
 		let new_individual_reward = reward + earlier_reward;
+		log::info!("new_individual_reward,{}",new_individual_reward);
 		EraRewardAccounts::<T>::insert(account.clone(), new_individual_reward);
 	}
 
@@ -297,9 +310,13 @@ impl<T: Config> Pallet<T> {
 	}
 
 	fn calculate_validator_reward(validator_points: u128, era_reward: u128) -> u128 {
+		log::info!("the validator_points {} and era_reward {}",validator_points,era_reward);
 		let era_reward_points = <ErasRewardPoints<T>>::get(Self::active_era());
+		log::info!(" era_reward_points{:?}",era_reward_points);
 		let total_points = era_reward_points.total as u128;
+		log::info!("the total_points{}",total_points);
 		let reward = (validator_points / total_points) * era_reward;
+		log::info!("reward in calculations{}",reward);
 		reward
 	}
 
