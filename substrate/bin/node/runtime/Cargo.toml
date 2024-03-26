@@ -108,9 +108,11 @@ pallet-remark = { path = "../../../frame/remark", default-features = false}
 pallet-reward = { path = "../../../frame/reward", default-features = false}
 pallet-root-testing = { path = "../../../frame/root-testing", default-features = false}
 pallet-salary = { path = "../../../frame/salary", default-features = false}
+liquid-staking-primitives = { path = "../../../primitives/liquid-staking", default-features = false }
 pallet-session = { path = "../../../frame/session", default-features = false , features = [ "historical" ]}
 pallet-session-benchmarking = { path = "../../../frame/session/benchmarking", default-features = false, optional = true }
 pallet-staking = { path = "../../../frame/staking", default-features = false}
+pallet-liquid-staking = { path = "../../../frame/liquid-staking", default-features = false}
 pallet-staking-runtime-api = { path = "../../../frame/staking/runtime-api", default-features = false}
 pallet-state-trie-migration = { path = "../../../frame/state-trie-migration", default-features = false}
 pallet-statement = { path = "../../../frame/statement", default-features = false}
@@ -119,6 +121,7 @@ pallet-society = { path = "../../../frame/society", default-features = false}
 pallet-sudo = { path = "../../../frame/sudo", default-features = false}
 pallet-timestamp = { path = "../../../frame/timestamp", default-features = false}
 pallet-tips = { path = "../../../frame/tips", default-features = false}
+pallet-currency-adapter = { path = "../../../frame/currency-adapter", default-features = false }
 pallet-treasury = { path = "../../../frame/treasury", default-features = false}
 pallet-utility = { path = "../../../frame/utility", default-features = false}
 pallet-transaction-payment = { path = "../../../frame/transaction-payment", default-features = false}
@@ -151,6 +154,7 @@ std = [
 	"frame-try-runtime?/std",
 	"log/std",
 	"node-primitives/std",
+	"liquid-staking-primitives/std",
 	"pallet-alliance/std",
 	"pallet-asset-conversion-tx-payment/std",
 	"pallet-asset-conversion/std",
@@ -172,6 +176,7 @@ std = [
 	"pallet-conviction-voting/std",
 	"pallet-core-fellowship/std",
 	"pallet-democracy/std",
+	"pallet-liquid-staking/std",
 	"pallet-election-provider-multi-phase/std",
 	"pallet-election-provider-support-benchmarking?/std",
 	"pallet-elections-phragmen/std",
@@ -194,6 +199,7 @@ std = [
 	"pallet-nomination-pools-benchmarking?/std",
 	"pallet-nomination-pools-runtime-api/std",
 	"pallet-nomination-pools/std",
+	"pallet-currency-adapter/std",
 	"pallet-offences-benchmarking?/std",
 	"pallet-offences/std",
 	"pallet-preimage/std",

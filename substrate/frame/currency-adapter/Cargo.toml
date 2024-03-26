@@ -1,0 +1,25 @@
+[package]
+name = "pallet-currency-adapter"
+version = "4.0.0-dev"
+authors.workspace = true
+edition.workspace = true
+
+[dependencies]
+codec = { package = "parity-scale-codec", version = "3.6.1", default-features = false, features = [
+	"derive",
+] }
+frame-support = { path = "../support", default-features = false}
+frame-system = { path = "../system", default-features = false}
+scale-info = { version = "2.0.0", default-features = false, features = ["derive"] }
+liquid-staking-primitives = { path = "../../primitives/liquid-staking", default-features = false }
+sp-runtime = { path = "../../primitives/runtime", default-features = false}
+
+[features]
+default = [ "std" ]
+std = [
+	"codec/std",
+    "frame-support/std",
+	"frame-system/std",
+    "scale-info/std",
+    "sp-runtime/std",
+]

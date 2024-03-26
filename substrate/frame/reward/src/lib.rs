@@ -8,6 +8,7 @@ pub use pallet::*;
 use pallet_staking::{ CurrentEra, Validators, ErasRewardPoints, ErasStakers, IndividualExposure };
 use pallet_treasury::TreasuryAccountId;
 use parity_scale_codec::Codec;
+use frame_support::traits::liquid_staking::StakingAccount;
 use scale_info::prelude::{ vec::Vec, fmt::Debug };
 use sp_runtime::{ FixedPointOperand, traits::{ Convert, AtLeast32BitUnsigned } };
 use frame_support::traits::{
@@ -46,6 +47,7 @@ pub mod pallet {
 			AccountId = <Self::ValidatorSet as ValidatorSet<Self::AccountId>>::ValidatorId,
 			BlockNumber = BlockNumberFor<Self>
 		>;
+		type LiquidStakeVault:StakingAccount<Self::AccountId>;
 		type ValidatorId: Convert<
 			<<Self as Config>::Validators as ValidatorSet<<Self as frame_system::Config>::AccountId>>::ValidatorId,
 			Option<Self::AccountId>
@@ -60,6 +62,7 @@ pub mod pallet {
 			Codec +
 			Default +
 			From<u128> +
+			Into<u128> +
 			Copy +
 			MaybeSerializeDeserialize +
 			Debug +
@@ -68,9 +71,9 @@ pub mod pallet {
 			FixedPointOperand;
 
 		#[pallet::constant]
-		type EraRewards : Get<u32>;	
+		type EraRewards: Get<u32>;
 
-		type Precision : Get<u32>;
+		type Precision: Get<u32>;
 
 		type TreasuryAccount: TreasuryAccountId<Self::AccountId>;
 
@@ -199,11 +202,11 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 			}
 
 			let validator_prefs = Validators::<T>::get(validator.clone());
-			let validator_commission =validator_prefs.commission.deconstruct();
-			let precision:u32 = 7;
-			let scaled_commission :u32 = validator_commission / (10u32).pow(precision);
-			let nominator_share :u32 = (reward * scaled_commission) / 100;
-			let validator_share :u32 = reward - nominator_share;
+			let validator_commission = validator_prefs.commission.deconstruct();
+			let precision: u32 = 7;
+			let scaled_commission: u32 = validator_commission / (10u32).pow(precision);
+			let nominator_share: u32 = (reward * scaled_commission) / 100;
+			let validator_share: u32 = reward - nominator_share;
 			Self::add_reward(validator.clone(), validator_share.into());
 
 			nominators.iter().for_each(|nominator| {
@@ -222,7 +225,6 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 		Ok(())
 	}
 }
-
 
 impl<T: Config> Pallet<T> {
 	fn transfer(
@@ -300,7 +302,7 @@ impl<T: Config> Pallet<T> {
 
 	fn distribute_validator_reward(account: T::AccountId) -> DispatchResult {
 		let reward = ValidatorRewardAccounts::<T>::get(account.clone());
-		Self::transfer(Self::treasury_account(), account.clone(), reward.into(), KeepAlive)?;
+		Self::transfer(Self::treasury_account(), account.clone(), reward, KeepAlive)?;
 		ValidatorRewardAccounts::<T>::remove(account.clone());
 		BeneficialRewardRecord::<T>::insert(account.clone(), reward);
 		Ok(())
@@ -309,7 +311,10 @@ impl<T: Config> Pallet<T> {
 	fn distribute_nominator_reward(account: T::AccountId) -> DispatchResult {
 		let reward = NominatorRewardAccounts::<T>::get(account.clone());
 		T::RewardCurrency::transfer(&Self::treasury_account(), &account, reward, KeepAlive)?;
-		NominatorRewardAccounts::<T>::remove(account.clone());
+		let staking_account = T::LiquidStakeVault::staking_account();
+		if account != staking_account {
+			NominatorRewardAccounts::<T>::remove(account.clone());
+		}
 		BeneficialRewardRecord::<T>::insert(account.clone(), reward);
 		Ok(())
 	}

@@ -38,3 +38,4 @@ pub use lifetime::{Create, Destroy};
 pub use regular::{
 	Balanced, DecreaseIssuance, Dust, IncreaseIssuance, Inspect, Mutate, Unbalanced,
 };
+pub use metadata::Inspect as OtherInspect;
