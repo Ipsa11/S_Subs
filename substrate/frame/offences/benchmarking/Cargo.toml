@@ -32,7 +32,6 @@ sp-std = { path = "../../../primitives/std", default-features = false}
 log = { version = "0.4.17", default-features = false }
 
 [dev-dependencies]
-pallet-staking-reward-curve = { path = "../../staking/reward-curve" }
 pallet-timestamp = { path = "../../timestamp" }
 sp-core = { path = "../../../primitives/core" }
 sp-io = { path = "../../../primitives/io" }

@@ -111,7 +111,6 @@ pallet-salary = { path = "../../../frame/salary", default-features = false}
 pallet-session = { path = "../../../frame/session", default-features = false , features = [ "historical" ]}
 pallet-session-benchmarking = { path = "../../../frame/session/benchmarking", default-features = false, optional = true }
 pallet-staking = { path = "../../../frame/staking", default-features = false}
-pallet-staking-reward-curve = { path = "../../../frame/staking/reward-curve", default-features = false}
 pallet-staking-runtime-api = { path = "../../../frame/staking/runtime-api", default-features = false}
 pallet-state-trie-migration = { path = "../../../frame/state-trie-migration", default-features = false}
 pallet-statement = { path = "../../../frame/statement", default-features = false}

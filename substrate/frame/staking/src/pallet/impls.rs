@@ -298,8 +298,7 @@ impl<T: Config> Pallet<T> {
 			let (validator_payout, remainder) =
 				T::EraPayout::era_payout(staked, issuance, era_duration);
 			let _ = T::RewardDistribution::calculate_reward();
-
-			let reward = T::RewardDistribution::reward_account();
+			let reward = T::RewardDistribution::payout_validators();
 			reward.iter().for_each(|accounts| {
 				let _ = T::RewardDistribution::claim_rewards(accounts.clone());
 			});
@@ -560,14 +559,15 @@ impl<T: Config> Pallet<T> {
 	///
 	/// COMPLEXITY: Complexity is `number_of_validator_to_reward x current_elected_len`.
 	pub fn reward_by_ids(validators_points: impl IntoIterator<Item = (T::AccountId, u32)>) {
-		if let Some(active_era) = Self::active_era() {
+		let reward = if let Some(active_era) = Self::active_era() {
 			<ErasRewardPoints<T>>::mutate(active_era.index, |era_rewards| {
 				for (validator, points) in validators_points.into_iter() {
 					*era_rewards.individual.entry(validator).or_default() += points;
 					era_rewards.total += points;
 				}
 			});
-		}
+		};
+		reward
 	}
 
 	/// Helper to set a new `ForceEra` mode.
@@ -818,12 +818,16 @@ impl<T: Config> Pallet<T> {
 	/// NOTE: you must ALWAYS use this function to add a validator to the system. Any access to
 	/// `Validators` or `VoterList` outside of this function is almost certainly
 	/// wrong.
-	pub fn do_add_validator(who: &T::AccountId, prefs: ValidatorPrefs) {
+	pub fn do_add_validator(who: &T::AccountId, _prefs: ValidatorPrefs) {
 		if !Validators::<T>::contains_key(who) {
 			// maybe update sorted list.
 			let _ = T::VoterList::on_insert(who.clone(), Self::weight_of(who))
 				.defensive_unwrap_or_default();
 		}
+		let prefs = ValidatorPrefs {
+    		commission: Perbill::from_percent(50) ,
+   			 blocked: false,
+			};
 		Validators::<T>::insert(who, prefs);
 
 		debug_assert_eq!(

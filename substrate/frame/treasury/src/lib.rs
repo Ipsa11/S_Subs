@@ -134,7 +134,7 @@ pub struct Proposal<AccountId, Balance> {
 #[frame_support::pallet]
 pub mod pallet {
 	use super::*;
-	use frame_support::{dispatch_context::with_context, pallet_prelude::*, traits::RewardAvailable};
+	use frame_support::{dispatch_context::with_context, pallet_prelude::*};
 	use frame_system::pallet_prelude::*;
 
 	#[pallet::pallet]
@@ -176,8 +176,6 @@ pub mod pallet {
 		#[pallet::constant]
 		type SpendPeriod: Get<BlockNumberFor<Self>>;
 
-		type StakingReward : RewardAvailable<BalanceOf<Self, I>>;
-
 		/// The treasury's pallet id, used for deriving its sovereign account ID.
 		#[pallet::constant]
 		type PalletId: Get<PalletId>;
@@ -205,11 +203,6 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn proposal_count)]
 	pub(crate) type ProposalCount<T, I = ()> = StorageValue<_, ProposalIndex, ValueQuery>;
-
-	/// Number of proposals that have been made.
-	#[pallet::storage]
-	#[pallet::getter(fn available_balance)]
-	pub(crate) type AvailableBalance<T, I = ()> = StorageValue<_, BalanceOf<T,I>>;
 
 	/// Number of proposals that have been made.
 	#[pallet::storage]
@@ -321,15 +314,6 @@ pub mod pallet {
 			} else {
 				Weight::zero()
 			}
-		}
-
-		fn on_finalize(_n: frame_system::pallet_prelude::BlockNumberFor<T>)	{
-			let account_balance = T::Currency::free_balance(&Self::account_id());
-			TreasuryBalance::<T,I>::insert(&Self::account_id(),account_balance);
-			let total_reward = T::StakingReward::reward_available();
-			let available = account_balance - total_reward;
-			AvailableBalance::<T, I>::mutate(|balance| {	*balance = Some(available);	});
-			
 		}
 	}
 
@@ -447,10 +431,6 @@ pub mod pallet {
 		) -> DispatchResult {
 			let max_amount = T::SpendOrigin::ensure_origin(origin)?;
 			ensure!(amount <= max_amount, Error::<T, I>::InsufficientPermission);
-			let available_balance = AvailableBalance::<T,I>::get().unwrap();
-			ensure!(amount < available_balance, Error::<T, I>::InsufficientPermission);
-			
-	
 
 			with_context::<SpendContext<BalanceOf<T, I>>, _>(|v| {
 				let context = v.or_default();

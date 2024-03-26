@@ -27,7 +27,6 @@ sp-staking = { path = "../../primitives/staking", default-features = false}
 [dev-dependencies]
 pallet-balances = { path = "../balances" }
 pallet-timestamp = { path = "../timestamp" }
-pallet-staking-reward-curve = { path = "../staking/reward-curve" }
 
 sp-core = { path = "../../primitives/core" }
 sp-io = { path = "../../primitives/io", default-features = false}

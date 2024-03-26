@@ -30,7 +30,6 @@ pallet-timestamp = { path = "../../timestamp" }
 pallet-balances = { path = "../../balances" }
 pallet-staking = { path = "../../staking" }
 pallet-bags-list = { path = "../../bags-list" }
-pallet-staking-reward-curve = { path = "../../staking/reward-curve" }
 pallet-nomination-pools = { path = ".." }
 
 sp-tracing = { path = "../../../primitives/tracing" }
