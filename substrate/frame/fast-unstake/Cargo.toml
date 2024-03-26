@@ -30,7 +30,6 @@ frame-benchmarking = { path = "../benchmarking", default-features = false, optio
 docify = "0.2.1"
 
 [dev-dependencies]
-pallet-staking-reward-curve = { path = "../staking/reward-curve" }
 sp-core = { path = "../../primitives/core", default-features = false}
 substrate-test-utils = { path = "../../test-utils" }
 sp-tracing = { path = "../../primitives/tracing" }

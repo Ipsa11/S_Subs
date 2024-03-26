@@ -28,7 +28,6 @@ frame-election-provider-support = { path = "../election-provider-support" }
 pallet-balances = { path = "../balances" }
 pallet-offences = { path = "../offences" }
 pallet-staking = { path = "../staking" }
-pallet-staking-reward-curve = { path = "../staking/reward-curve" }
 pallet-timestamp = { path = "../timestamp" }
 sp-core = { path = "../../primitives/core" }
 sp-io = { path = "../../primitives/io" }

@@ -29,7 +29,6 @@ codec = { package = "parity-scale-codec", version = "3.6.1", features = ["derive
 scale-info = "2.1.1"
 frame-election-provider-support = { path = "../../election-provider-support" }
 pallet-balances = { path = "../../balances" }
-pallet-staking-reward-curve = { path = "../../staking/reward-curve" }
 pallet-timestamp = { path = "../../timestamp" }
 sp-core = { path = "../../../primitives/core" }
 sp-io = { path = "../../../primitives/io" }

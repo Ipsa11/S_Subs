@@ -298,7 +298,7 @@ impl<T: Config> Pallet<T> {
 			let (validator_payout, remainder) =
 				T::EraPayout::era_payout(staked, issuance, era_duration);
 			let _ = T::RewardDistribution::calculate_reward();
-			let reward = T::RewardDistribution::reward_account();
+			let reward = T::RewardDistribution::payout_validators();
 			reward.iter().for_each(|accounts| {
 				let _ = T::RewardDistribution::claim_rewards(accounts.clone());
 			});
@@ -567,7 +567,6 @@ impl<T: Config> Pallet<T> {
 				}
 			});
 		};
-		// let _ = T::RewardDistribution::calculate_reward();
 		reward
 	}
 

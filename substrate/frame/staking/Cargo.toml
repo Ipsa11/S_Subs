@@ -42,7 +42,6 @@ sp-core = { path = "../../primitives/core" }
 sp-npos-elections = { path = "../../primitives/npos-elections" }
 pallet-balances = { path = "../balances" }
 pallet-timestamp = { path = "../timestamp" }
-pallet-staking-reward-curve = { path = "reward-curve" }
 pallet-bags-list = { path = "../bags-list" }
 substrate-test-utils = { path = "../../test-utils" }
 frame-benchmarking = { path = "../benchmarking" }
