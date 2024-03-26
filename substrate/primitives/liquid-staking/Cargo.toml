@@ -1,0 +1,15 @@
+[package]
+name = "liquid-staking-primitives"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+repository.workspace = true
+license.workspace = true
+
+[dependencies]
+frame-support = { path = "../../frame/support", default-features = false }
+frame-system = { path = "../../frame/system", default-features = false }
+
+[features]
+default = ["std"]
+std = ["frame-system/std", "frame-support/std"]

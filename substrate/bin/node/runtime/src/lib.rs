@@ -27,6 +27,7 @@ use frame_election_provider_support::{
 	bounds::{ElectionBounds, ElectionBoundsBuilder},
 	onchain, BalancingConfig, ElectionDataProvider, SequentialPhragmen, VoteWeight,
 };
+use sp_runtime::traits::Zero;
 use frame_support::{
 	construct_runtime,
 	dispatch::DispatchClass,
@@ -53,6 +54,7 @@ use frame_system::{
 	limits::{BlockLength, BlockWeights},
 	EnsureRoot, EnsureRootWithSuccess, EnsureSigned, EnsureSignedBy, EnsureWithSuccess,
 };
+use pallet_liquid_staking::types::DecimalProvider;
 pub use node_primitives::{AccountId, Signature};
 use node_primitives::{AccountIndex, Balance, BlockNumber, Hash, Moment, Nonce};
 use pallet_asset_conversion::{NativeOrAssetId, NativeOrAssetIdConverter};
@@ -60,6 +62,7 @@ use pallet_broker::{CoreAssignment, CoreIndex, CoretimeInterface, PartsOf57600};
 use pallet_election_provider_multi_phase::SolutionAccuracyOf;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use pallet_nfts::PalletFeatures;
+use frame_support::traits::tokens::fungibles::OtherInspect;
 use pallet_nis::WithMaximumOf;
 use pallet_session::historical as pallet_session_historical;
 pub use pallet_transaction_payment::{CurrencyAdapter, Multiplier, TargetedFeeAdjustment};
@@ -103,7 +106,7 @@ pub mod impls;
 #[cfg(not(feature = "runtime-benchmarks"))]
 use impls::AllianceIdentityVerifier;
 use impls::{AllianceProposalProvider, Author, CreditToBlockAuthor};
-
+use liquid_staking_primitives::{CurrencyId,SAITA,SSAITA};
 /// Constant values used within the runtime.
 pub mod constants;
 use constants::{currency::*, time::*};
@@ -664,6 +667,48 @@ impl pallet_staking::Config for Runtime {
 	type BenchmarkingConfig = StakingBenchmarkingConfig;
 	type RewardDistribution = Reward;
 }
+pub const NATIVE_ASSET_ID: u32 = SAITA;
+parameter_types! {
+    pub const LiquidCurrency: CurrencyId = SSAITA;
+	pub const NativeCurrencyId: CurrencyId = SAITA;
+	pub const StakingPalletId: PalletId = PalletId(*b"par/lqsk");
+	pub const MinStake: Balance = 1;
+}
+
+pub struct Decimal;
+impl DecimalProvider<CurrencyId> for Decimal {
+    fn get_decimal(asset_id: &CurrencyId) -> Option<u8> {
+        match *asset_id {
+            NATIVE_ASSET_ID => Some(12_u8),
+            _ => {
+                let decimal = <Assets as OtherInspect<AccountId>>::decimals(*asset_id);
+                if decimal.is_zero() {
+                    None
+                } else {
+                    Some(decimal)
+                }
+            }
+        }
+    }
+}
+
+impl pallet_currency_adapter::Config for Runtime {
+    type Assets = Assets;
+    type Balances = Balances;
+    type GetNativeCurrencyId = NativeCurrencyId;
+    type LockOrigin =EnsureRoot<AccountId>;
+}
+
+impl pallet_liquid_staking::Config for Runtime{
+	type RuntimeEvent = RuntimeEvent;
+	type Assets = OtherCurrencyAdapter;
+	type Decimal = Decimal;
+    type LiquidCurrency = LiquidCurrency;
+	type PalletId = StakingPalletId;
+	type MinStake = MinStake;
+	type Balances = Balances;
+	
+}
 impl pallet_reward::Config for Runtime{
 	type Validators = Historical;
 	type ValidatorId = pallet_staking::StashOf<Self>;
@@ -676,6 +721,7 @@ impl pallet_reward::Config for Runtime{
 	type RewardCurrency = Balances;
 	type EraRewards = EraRewards;
 	type Precision = DecimalPrecision;
+	type LiquidStakeVault = LiquidStaking;
 }
 
 impl pallet_fast_unstake::Config for Runtime {
@@ -2093,6 +2139,8 @@ construct_runtime!(
 		SafeMode: pallet_safe_mode,
 		Statement: pallet_statement,
 		Broker: pallet_broker,
+		LiquidStaking:pallet_liquid_staking,
+		OtherCurrencyAdapter: pallet_currency_adapter,
 	}
 );
 

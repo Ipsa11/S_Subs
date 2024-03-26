@@ -1,0 +1,27 @@
+[package]
+name = "pallet-liquid-staking"
+version = "4.0.0-dev"
+authors.workspace = true
+edition.workspace = true
+
+[dependencies]
+frame-support = { path = "../support", default-features = false }
+pallet-staking = { path = "../staking", default-features = false }
+pallet-reward = { path = "../reward", default-features = false }
+frame-system = { path = "../system", default-features = false }
+liquid-staking-primitives = { path = "../../primitives/liquid-staking", default-features = false }
+sp-runtime = { path = "../../primitives/runtime", default-features = false }
+scale-info = { version = "2.5.0", default-features = false, features = ["derive"] }
+parity-scale-codec = { version = "3.6.1", default-features = false, features = [ "derive","max-encoded-len" ] }
+frame-benchmarking = { version = "4.0.0-dev", default-features = false, optional = true, path = "../../frame/benchmarking" }
+pallet-assets = { path = "../assets", default-features = false }
+log = "0.4.20"
+
+[dev-dependencies]
+
+[features]
+default = ["std"]
+std = ["parity-scale-codec/std", "scale-info/std", "sp-runtime/std", "pallet-reward/std","pallet-staking/std", "pallet-assets/std", "frame-support/std", "frame-system/std"]
+
+runtime-benchmarks = ["frame-benchmarking/runtime-benchmarks"]
+try-runtime = ["frame-support/try-runtime"]
