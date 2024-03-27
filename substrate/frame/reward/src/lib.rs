@@ -197,7 +197,8 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 			let reward = Self::calculate_validator_reward(validator_points.into(), era_reward);
 			let nominators = Self::check_nominators(validator.clone());
 			if nominators.is_empty() {
-				Self::add_reward(validator.clone(), reward.into());
+				let converted_reward = Self::convert_f64_to_u128(reward);
+				Self::add_reward(validator.clone(), converted_reward.into());
 				return;
 			}
 
@@ -205,9 +206,10 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 			let validator_commission = validator_prefs.commission.deconstruct();
 			let precision: u32 = 7;
 			let scaled_commission: u32 = validator_commission / (10u32).pow(precision);
-			let nominator_share: u32 = (reward * scaled_commission) / 100;
-			let validator_share: u32 = reward - nominator_share;
-			Self::add_reward(validator.clone(), validator_share.into());
+			let nominator_share = (reward as f64 * scaled_commission as f64) / 100.0;
+			let validator_share = reward - nominator_share;
+			let converted_reward = Self::convert_f64_to_u128(validator_share);
+			Self::add_reward(validator.clone(), converted_reward.into());
 
 			nominators.iter().for_each(|nominator| {
 				let nominator_stake = nominator.value;
@@ -233,9 +235,7 @@ impl<T: Config> Pallet<T> {
 		amount: T::Balance,
 		existence_requirement: ExistenceRequirement
 	) -> DispatchResult {
-		let precision = T::Precision::get();
-		let scale_amount = amount * (10u128).pow(precision).into();
-		T::RewardCurrency::transfer(&who, &dest, scale_amount, existence_requirement)?;
+		T::RewardCurrency::transfer(&who, &dest, amount, existence_requirement)?;
 		Self::deposit_event(Event::Distributed { who: dest, balance: amount });
 		Ok(())
 	}
@@ -329,10 +329,10 @@ impl<T: Config> Pallet<T> {
 		era
 	}
 
-	fn calculate_validator_reward(validator_points: u32, era_reward: u32) -> u32 {
+	fn calculate_validator_reward(validator_points: u32, era_reward: u32) -> f64 {
 		let era_reward_points = <ErasRewardPoints<T>>::get(Self::active_era());
 		let total_points = era_reward_points.total as u32;
-		let reward = (validator_points / total_points) * era_reward;
+		let reward = (validator_points as f64 / total_points as f64) * era_reward as f64;
 		reward
 	}
 
