@@ -194,7 +194,8 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 			let validator = T::ValidatorId::convert(validator_id.clone()).unwrap();
 			let validator_points = Self::get_validator_point(validator.clone());
 			let era_reward = T::EraRewards::get();
-			let reward = Self::calculate_validator_reward(validator_points.into(), era_reward);
+			let total_reward = era_reward *  validators.len() as u32;
+			let reward = Self::calculate_validator_reward(validator_points.into(), total_reward);
 			let nominators = Self::check_nominators(validator.clone());
 			if nominators.is_empty() {
 				let converted_reward = Self::convert_f64_to_u128(reward);
