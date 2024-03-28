@@ -627,10 +627,6 @@ impl pallet_staking::BenchmarkingConfig for StakingBenchmarkingConfig {
 	type MaxNominators = ConstU32<1000>;
 	type MaxValidators = ConstU32<1000>;
 }
-parameter_types! {
-	pub const EraRewards:u32 = 2;
-	pub const DecimalPrecision:u32 = 12;
-}
 
 impl pallet_staking::Config for Runtime {
 	type Currency = Balances;
@@ -709,6 +705,13 @@ impl pallet_liquid_staking::Config for Runtime{
 	type Balances = Balances;
 	
 }
+
+parameter_types! {
+	pub const EraMinutes:u32 = 1;
+	pub const DecimalPrecision:u32 = 12;
+	pub const TotalMinutesPerYear:u32 = 525600; 
+	pub const TotalReward :u32 = 1113158;
+}
 impl pallet_reward::Config for Runtime{
 	type Validators = Historical;
 	type ValidatorId = pallet_staking::StashOf<Self>;
@@ -719,9 +722,11 @@ impl pallet_reward::Config for Runtime{
 	type DataProvider = <Runtime as pallet_election_provider_multi_phase::Config>::DataProvider;
 	type TreasuryAccount = Treasury;
 	type RewardCurrency = Balances;
-	type EraRewards = EraRewards;
 	type Precision = DecimalPrecision;
 	type LiquidStakeVault = LiquidStaking;
+	type TotalMinutesPerYear = TotalMinutesPerYear;
+	type EraMinutes = EraMinutes;
+	type TotalReward = TotalReward;
 }
 
 impl pallet_fast_unstake::Config for Runtime {
