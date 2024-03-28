@@ -47,7 +47,7 @@ pub mod pallet {
 			AccountId = <Self::ValidatorSet as ValidatorSet<Self::AccountId>>::ValidatorId,
 			BlockNumber = BlockNumberFor<Self>
 		>;
-		type LiquidStakeVault:StakingAccount<Self::AccountId>;
+		type LiquidStakeVault: StakingAccount<Self::AccountId>;
 		type ValidatorId: Convert<
 			<<Self as Config>::Validators as ValidatorSet<<Self as frame_system::Config>::AccountId>>::ValidatorId,
 			Option<Self::AccountId>
@@ -71,12 +71,14 @@ pub mod pallet {
 			FixedPointOperand;
 
 		#[pallet::constant]
-		type EraRewards: Get<u32>;
+		type TotalReward: Get<u32>;
 
 		type Precision: Get<u32>;
 
+		#[pallet::constant]
+		type TotalMinutesPerYear: Get<u32>;
+		type EraMinutes: Get<u32>;
 		type TreasuryAccount: TreasuryAccountId<Self::AccountId>;
-
 		type RewardCurrency: LockableCurrency<
 			Self::AccountId,
 			Moment = BlockNumberFor<Self>,
@@ -193,13 +195,15 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 		validators.iter().for_each(|validator_id| {
 			let validator = T::ValidatorId::convert(validator_id.clone()).unwrap();
 			let validator_points = Self::get_validator_point(validator.clone());
-			let era_reward = T::EraRewards::get();
-			let total_reward = era_reward *  validators.len() as u32;
+			let era_reward = Self::calculate_era_reward();
+			let total_reward = (era_reward as f64) * (validators.len() as f64);
 			let reward = Self::calculate_validator_reward(validator_points.into(), total_reward);
 			let nominators = Self::check_nominators(validator.clone());
 			if nominators.is_empty() {
-				let converted_reward = Self::convert_f64_to_u128(reward);
-				Self::add_reward(validator.clone(), converted_reward.into());
+				Self::add_validator_reward(
+					validator.clone(),
+					Self::convert_f64_to_u128(reward).into()
+				);
 				return;
 			}
 
@@ -207,10 +211,12 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 			let validator_commission = validator_prefs.commission.deconstruct();
 			let precision: u32 = 7;
 			let scaled_commission: u32 = validator_commission / (10u32).pow(precision);
-			let nominator_share = (reward as f64 * scaled_commission as f64) / 100.0;
+			let nominator_share = ((reward as f64) * (scaled_commission as f64)) / 100.0;
 			let validator_share = reward - nominator_share;
-			let converted_reward = Self::convert_f64_to_u128(validator_share);
-			Self::add_reward(validator.clone(), converted_reward.into());
+			Self::add_validator_reward(
+				validator.clone(),
+				Self::convert_f64_to_u128(validator_share).into()
+			);
 
 			nominators.iter().for_each(|nominator| {
 				let nominator_stake = nominator.value;
@@ -221,8 +227,10 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 					total_stake.into(),
 					nominator_share.into()
 				);
-				let converted_reward = Self::convert_f64_to_u128(nominator_reward);
-				Self::add_nominator_reward(nominator.who.clone(), converted_reward.into());
+				Self::add_nominator_reward(
+					nominator.who.clone(),
+					Self::convert_f64_to_u128(nominator_reward).into()
+				);
 			});
 		});
 		Ok(())
@@ -267,6 +275,14 @@ impl<T: Config> Pallet<T> {
 		EraRewardsVault::<T>::put(era_reward_accounts);
 		Ok(())
 	}
+	pub fn calculate_era_reward() -> f64 {
+		let total_minutes_per_year = T::TotalMinutesPerYear::get();
+		let era_minutes = T::EraMinutes::get();
+		let era = total_minutes_per_year / era_minutes;
+		let total_reward = T::TotalReward::get();
+		let era_reward = total_reward / era;
+		era_reward.into()
+	}
 
 	pub fn calculate_nominator_reward(share: u128, total_stake: u128, reward: f64) -> f64 {
 		let precision = T::Precision::get();
@@ -283,7 +299,7 @@ impl<T: Config> Pallet<T> {
 		number
 	}
 
-	fn add_reward(account: T::AccountId, reward: T::Balance) {
+	fn add_validator_reward(account: T::AccountId, reward: T::Balance) {
 		let earlier_reward = ValidatorRewardAccounts::<T>::get(account.clone());
 		let new_individual_reward = reward + earlier_reward;
 		ValidatorRewardAccounts::<T>::insert(account.clone(), new_individual_reward);
@@ -330,10 +346,10 @@ impl<T: Config> Pallet<T> {
 		era
 	}
 
-	fn calculate_validator_reward(validator_points: u32, era_reward: u32) -> f64 {
+	fn calculate_validator_reward(validator_points: u32, era_reward: f64) -> f64 {
 		let era_reward_points = <ErasRewardPoints<T>>::get(Self::active_era());
 		let total_points = era_reward_points.total as u32;
-		let reward = (validator_points as f64 / total_points as f64) * era_reward as f64;
+		let reward = ((validator_points as f64) / (total_points as f64)) * (era_reward as f64);
 		reward
 	}
 
