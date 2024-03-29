@@ -211,8 +211,8 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 			let validator_commission = validator_prefs.commission.deconstruct();
 			let precision: u32 = 7;
 			let scaled_commission: u32 = validator_commission / (10u32).pow(precision);
-			let nominator_share = ((reward as f64) * (scaled_commission as f64)) / 100.0;
-			let validator_share = reward - nominator_share;
+			let validator_share = ((reward as f64) * (scaled_commission as f64)) / 100.0;
+			let nominator_share = reward - validator_share;
 			Self::add_validator_reward(
 				validator.clone(),
 				Self::convert_f64_to_u128(validator_share).into()

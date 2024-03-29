@@ -818,16 +818,12 @@ impl<T: Config> Pallet<T> {
 	/// NOTE: you must ALWAYS use this function to add a validator to the system. Any access to
 	/// `Validators` or `VoterList` outside of this function is almost certainly
 	/// wrong.
-	pub fn do_add_validator(who: &T::AccountId, _prefs: ValidatorPrefs) {
+	pub fn do_add_validator(who: &T::AccountId, prefs: ValidatorPrefs) {
 		if !Validators::<T>::contains_key(who) {
 			// maybe update sorted list.
 			let _ = T::VoterList::on_insert(who.clone(), Self::weight_of(who))
 				.defensive_unwrap_or_default();
 		}
-		let prefs = ValidatorPrefs {
-    		commission: Perbill::from_percent(50) ,
-   			 blocked: false,
-			};
 		Validators::<T>::insert(who, prefs);
 
 		debug_assert_eq!(
