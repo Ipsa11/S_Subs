@@ -204,11 +204,6 @@ pub mod pallet {
 	#[pallet::getter(fn proposal_count)]
 	pub(crate) type ProposalCount<T, I = ()> = StorageValue<_, ProposalIndex, ValueQuery>;
 
-	/// Number of proposals that have been made.
-	#[pallet::storage]
-	#[pallet::getter(fn treasury_balance)]
-	pub(crate) type TreasuryBalance<T: Config<I>, I: 'static = ()> =StorageMap<_,Blake2_128Concat,T::AccountId, BalanceOf<T,I>>;
-
 	/// Proposals that have been made.
 	#[pallet::storage]
 	#[pallet::getter(fn proposals)]
