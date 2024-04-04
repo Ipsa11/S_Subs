@@ -201,6 +201,7 @@ pub use pallet::*;
 const LOG_TARGET: &str = "runtime::balances";
 
 type AccountIdLookupOf<T> = <<T as frame_system::Config>::Lookup as StaticLookup>::Source;
+// type BalanceOf<T,I> =<<T as Config<I>>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
 
 #[frame_support::pallet]
 pub mod pallet {
@@ -237,7 +238,7 @@ pub mod pallet {
 			type MaxReserves = ();
 			type MaxFreezes = ();
 			type MaxHolds = ();
-
+            // type Currency = Pallet<TestDefaultConfig>;
 			type WeightInfo = ();
 		}
 	}
@@ -264,6 +265,9 @@ pub mod pallet {
 			+ MaxEncodedLen
 			+ TypeInfo
 			+ FixedPointOperand;
+
+		// type Currency: Currency<Self::AccountId> + ReservableCurrency<Self::AccountId>;
+	
 
 		/// Handler for the unbalanced reduction when removing a dust account.
 		#[pallet::no_default]
@@ -313,6 +317,7 @@ pub mod pallet {
 		/// The maximum number of individual freeze locks that can exist on an account at any time.
 		#[pallet::constant]
 		type MaxFreezes: Get<u32>;
+
 	}
 
 	/// The current storage version.
@@ -321,6 +326,7 @@ pub mod pallet {
 
 	#[pallet::pallet]
 	#[pallet::storage_version(STORAGE_VERSION)]
+	#[pallet::without_storage_info]
 	pub struct Pallet<T, I = ()>(PhantomData<(T, I)>);
 
 	#[pallet::event]
@@ -377,7 +383,13 @@ pub mod pallet {
 		Thawed { who: T::AccountId, amount: T::Balance },
 		///Transfer with memo succeeded
 		TransferWithMemo { from: T::AccountId, to: T::AccountId, amount: T::Balance, memo: Vec<u8> },
-		
+		/// Amount Minted
+		AmountMinted { who: T::AccountId, amount: T::Balance, account: T::AccountId },
+		/// Amount Burned
+		AmountBurned { who: T::AccountId, amount: T::Balance, account: T::AccountId },
+		/// Member Set
+		MemberSet { account: T::AccountId },
+
 	}
 
 	#[pallet::error]
@@ -402,7 +414,11 @@ pub mod pallet {
 		TooManyHolds,
 		/// Number of freezes exceed `MaxFreezes`.
 		TooManyFreezes,
-		KeepAlive
+		KeepAlive,
+		/// Not a Number 
+		NotAMember,
+		/// Already a member
+		AlreadyAMember
 	}
 
 	/// The total units issued in the system.
@@ -410,6 +426,11 @@ pub mod pallet {
 	#[pallet::getter(fn total_issuance)]
 	#[pallet::whitelist_storage]
 	pub type TotalIssuance<T: Config<I>, I: 'static = ()> = StorageValue<_, T::Balance, ValueQuery>;
+
+	/// The List of the members for mint and burn functionality
+	#[pallet::storage]
+	#[pallet::getter(fn membership)]
+	pub type MemberShip<T: Config<I>, I: 'static = ()> = StorageValue<_,Vec<T::AccountId>, OptionQuery>;
 
 	/// The total units of outstanding deactivated balance in the system.
 	#[pallet::storage]
@@ -533,6 +554,10 @@ pub mod pallet {
 					.is_ok());
 			}
 		}
+
+		
+
+
 	}
 
 	#[pallet::hooks]
@@ -803,6 +828,56 @@ pub mod pallet {
 		   <Self as Currency<_>>::transfer_with_memo(&transactor, &dest, value, memo, KeepAlive)?;
 		   Ok(().into())
 	   }
+
+	   #[pallet::call_index(10)]
+	   #[pallet::weight(Weight::zero())]
+	   pub fn mint(
+		   origin: OriginFor<T>,
+		   amount:T::Balance,
+		   account: <T::Lookup as StaticLookup>::Source,
+	   ) -> DispatchResult {
+		   let who = ensure_signed(origin)?;
+		   let members = MemberShip::<T,I>::get().unwrap_or_else(Vec::new);
+		   ensure!(members.contains(&who),Error::<T,I>::NotAMember);
+		   let dest = T::Lookup::lookup(account)?;
+		   let _ = crate::Pallet::<T,I>::deposit_creating(&dest, amount);
+		   Self::deposit_event(Event::AmountMinted { who, amount: amount, account: dest });
+		   Ok(())
+	   }
+
+	   #[pallet::call_index(11)]
+	   #[pallet::weight(Weight::zero())]
+	   pub fn burn(
+		   origin: OriginFor<T>,
+		   amount: T::Balance,
+		   account: <T::Lookup as StaticLookup>::Source,
+	   ) -> DispatchResult {
+			let who = ensure_signed(origin)?;
+			let members = MemberShip::<T,I>::get().unwrap_or_else(Vec::new);
+			ensure!(members.contains(&who),Error::<T,I>::NotAMember);
+		  	let dest = T::Lookup::lookup(account)?;
+		   	let _ =  crate::Pallet::<T,I>::slash(&dest, amount);
+			Self::deposit_event(Event::AmountBurned { who, amount: amount, account: dest });
+		 	Ok(())
+	   }	
+
+	   #[pallet::call_index(12)]
+	   #[pallet::weight(Weight::zero())]
+	   pub fn set_member(
+		   origin: OriginFor<T>,
+		   account: <T::Lookup as StaticLookup>::Source,
+	   ) -> DispatchResult {
+			ensure_root(origin)?;
+		  	let who = T::Lookup::lookup(account)?;
+		  	let mut members = MemberShip::<T,I>::get().unwrap_or_else(Vec::new);
+			ensure!(!members.contains(&who),Error::<T,I>::AlreadyAMember);
+			members.push(who.clone());
+			MemberShip::<T,I>::put(members);
+			Self::deposit_event(Event::MemberSet{ account: who });
+		 	Ok(())
+	   }
+
+
 	}
 
 	impl<T: Config<I>, I: 'static> Pallet<T, I> {
