@@ -208,7 +208,7 @@ pub mod pallet {
 	use super::*;
 	use frame_support::{
 		pallet_prelude::*,
-		traits::{fungible::Credit, tokens::Precision},
+		traits::{blacklist::BlackListAccounts, fungible::Credit, tokens::Precision},
 	};
 	use frame_system::pallet_prelude::*;
 
@@ -389,7 +389,10 @@ pub mod pallet {
 		AmountBurned { who: T::AccountId, amount: T::Balance, account: T::AccountId },
 		/// Member Set
 		MemberSet { account: T::AccountId },
-
+        /// Account is Blacklisted
+		AccountBlacklisted { account: T::AccountId },
+		/// Account is Whitelisted
+		AccountWhitelisted { account: T::AccountId },
 	}
 
 	#[pallet::error]
@@ -431,6 +434,11 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn membership)]
 	pub type MemberShip<T: Config<I>, I: 'static = ()> = StorageValue<_,Vec<T::AccountId>, OptionQuery>;
+
+	/// The List of the blacklisted accounts
+	#[pallet::storage]
+	#[pallet::getter(fn blacklist_accounts)]
+	pub type BlackList<T: Config<I>, I: 'static = ()> = StorageValue<_,Vec<T::AccountId>, OptionQuery>;
 
 	/// The total units of outstanding deactivated balance in the system.
 	#[pallet::storage]
@@ -814,6 +822,10 @@ pub mod pallet {
 			Ok(())
 		}
 
+
+		/// Transfers balance along with a message
+		/// 
+		/// The dispatch origin for this call is signed.
 		#[pallet::call_index(9)]
 		#[pallet::weight(T::WeightInfo::transfer_with_memo())]
 		pub fn transfer_with_memo(
@@ -829,6 +841,9 @@ pub mod pallet {
 		   Ok(().into())
 	   }
 
+	   /// Mint new tokens
+	   /// 
+	   /// The dispatch origin for this call is signed
 	   #[pallet::call_index(10)]
 	   #[pallet::weight(Weight::zero())]
 	   pub fn mint(
@@ -845,6 +860,9 @@ pub mod pallet {
 		   Ok(())
 	   }
 
+	   /// Destroys the existing tokens
+	   /// 
+	   /// The dispatch origin for this call is signed
 	   #[pallet::call_index(11)]
 	   #[pallet::weight(Weight::zero())]
 	   pub fn burn(
@@ -861,6 +879,9 @@ pub mod pallet {
 		 	Ok(())
 	   }	
 
+	   /// Sets the members to perform mint and burn fnctionality
+	   /// 
+	   /// The disptach origin for this call is root
 	   #[pallet::call_index(12)]
 	   #[pallet::weight(Weight::zero())]
 	   pub fn set_member(
@@ -877,8 +898,53 @@ pub mod pallet {
 		 	Ok(())
 	   }
 
+	   /// Blacklist the users from performing any transactions
+	   /// 
+	   /// The disptach origin for this call is root
+	   #[pallet::call_index(13)]
+	   #[pallet::weight(Weight::zero())]
+	   pub fn blacklist(
+		   origin: OriginFor<T>,
+		   account: <T::Lookup as StaticLookup>::Source,
+	   ) -> DispatchResult {
+			ensure_root(origin)?;
+		  	let who = T::Lookup::lookup(account)?;
+		  	let mut members = BlackList::<T,I>::get().unwrap_or_else(Vec::new);
+			ensure!(!members.contains(&who),Error::<T,I>::AlreadyAMember);
+			members.push(who.clone());
+			BlackList::<T,I>::put(members);
+			Self::deposit_event(Event::AccountBlacklisted{ account: who });
+		 	Ok(())
+	   }
+
+       /// Whitelist the Blacklisted users
+	   /// 
+	   /// The disptach origin for this call is root
+	   #[pallet::call_index(14)]
+	   #[pallet::weight(Weight::zero())]
+	   pub fn whitelist(
+		   origin: OriginFor<T>,
+		   account: <T::Lookup as StaticLookup>::Source,
+	   ) -> DispatchResult {
+			ensure_root(origin)?;
+		  	let who = T::Lookup::lookup(account)?;
+		  	let mut members = BlackList::<T,I>::get().unwrap_or_else(Vec::new);
+			if let Some(index) = members.iter().position(|a| a == &who.clone()) {
+				members.remove(index);
+			}
+			BlackList::<T,I>::put(members);
+			Self::deposit_event(Event::AccountWhitelisted{ account: who });
+		 	Ok(())
+	   }
+
 
 	}
+
+	impl<T: Config<I>, I: 'static> BlackListAccounts<T::AccountId> for Pallet<T, I> {
+		fn blacklisted_accounts() -> Vec<T::AccountId> {
+			BlackList::<T,I>::get().unwrap_or_else(Vec::new)
+		}
+	 }
 
 	impl<T: Config<I>, I: 'static> Pallet<T, I> {
 		fn ed() -> T::Balance {

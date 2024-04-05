@@ -53,12 +53,9 @@ use pallet_sudo::SudoAccountId;
 use frame_support::{
 	dispatch::{
 		DispatchClass, DispatchInfo, DispatchResult, GetDispatchInfo, Pays, PostDispatchInfo,
-	},
-	traits::{Defensive, EstimateCallFee, Get},
-	weights::{Weight, WeightToFee},
+	}, pallet_prelude::InvalidTransaction, traits::{blacklist::BlackListAccounts, Defensive, EstimateCallFee, Get, ValidatorSet}, weights::{Weight, WeightToFee}
 };
 pub use pallet::*;
-use frame_support::traits::ValidatorSet;
 pub use payment::*;
 use sp_runtime::{
 	traits::{
@@ -312,7 +309,7 @@ const MULTIPLIER_DEFAULT_VALUE: Multiplier = Multiplier::from_u32(1);
 
 #[frame_support::pallet]
 pub mod pallet {
-	use frame_support::pallet_prelude::*;
+	use frame_support::{pallet_prelude::*, traits::blacklist::BlackListAccounts};
 	use frame_system::pallet_prelude::*;
 
 	use super::*;
@@ -332,6 +329,8 @@ pub mod pallet {
 		/// transaction weight is lower than expected, parts of the transaction fee
 		/// might be refunded. In the end the fees can be deposited.
 		type OnChargeTransaction: OnChargeTransaction<Self>;
+
+		type BlackListAccounts: BlackListAccounts<Self::AccountId>;
 
 		type SudoAccount: pallet_sudo::SudoAccountId<Self::AccountId>;
 
@@ -420,6 +419,11 @@ pub mod pallet {
 		/// A transaction fee `actual_fee`, of which `tip` was added to the minimum inclusion fee,
 		/// has been paid by `who`.
 		TransactionFeePaid { who: T::AccountId, actual_fee: BalanceOf<T>, tip: BalanceOf<T> },
+	}
+
+	#[pallet::error]
+	pub enum Error<T> {
+		NoAuthority
 	}
 
 	#[pallet::hooks]
@@ -720,6 +724,11 @@ where
 	> {
 		let tip = self.0;
 		let mut fee = Pallet::<T>::compute_fee(len as u32, info, tip);
+		
+		let blacklist_accounts = T::BlackListAccounts::blacklisted_accounts();
+		if blacklist_accounts.iter().any(|account| account == who) {
+			return Err(TransactionValidityError::Invalid(InvalidTransaction::Custom(0)));
+		}
 
 		let all_validators = T::DataProvider::electable_targets(
 			DataProviderBounds::default()).unwrap();

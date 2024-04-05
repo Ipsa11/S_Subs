@@ -116,6 +116,7 @@ pub use messages::{
 	TransformOrigin,
 };
 pub mod liquid_staking;
+pub mod blacklist;
 pub mod reward;
 mod safe_mode;
 pub use safe_mode::{SafeMode, SafeModeError, SafeModeNotify};
