@@ -86,7 +86,7 @@ pub mod pallet {
 		>;
 	}
 
-	/// The era reward which are distributed among the validator abd nominator
+	/// The era reward which are distributed among the validator and nominator
 	#[pallet::storage]
 	#[pallet::getter(fn total_rewards)]
 	pub type BeneficialRewardRecord<T: Config> = StorageMap<
