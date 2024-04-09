@@ -318,7 +318,7 @@ pub mod pallet {
 	pub struct Pallet<T>(_);
 
 	#[pallet::config]
-	pub trait Config: frame_system::Config + pallet_staking::Config  {
+	pub trait Config: frame_system::Config   {
 		/// The overarching event type.
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 
@@ -733,14 +733,13 @@ where
 		let all_validators = T::DataProvider::electable_targets(
 			DataProviderBounds::default()).unwrap();
 
-		let nominators = pallet_staking::Nominators::<T>::contains_key(who);
 		let val = all_validators
 			.iter()
 			.any(|c| T::ValidatorIdOf::convert(who.clone()) == Some(c.clone()));
 
 		let sudo = T::SudoAccount::sudo_account();
 
-		if val || nominators || who == &sudo 
+		if val || who == &sudo 
 	 	{
 			fee = Zero::zero();
 		}	
