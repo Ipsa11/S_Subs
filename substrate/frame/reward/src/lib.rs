@@ -5,6 +5,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 use frame_support::pallet_prelude::DispatchResult;
 pub use pallet::*;
+use sp_runtime::traits::Zero;
 use pallet_staking::{ CurrentEra, Validators, ErasRewardPoints, ErasStakers, IndividualExposure };
 use pallet_treasury::TreasuryAccountId;
 use parity_scale_codec::Codec;
@@ -345,19 +346,22 @@ impl<T: Config> Pallet<T> {
 		let reward = ValidatorRewardAccounts::<T>::get(account.clone());
 		Self::transfer(Self::treasury_account(), account.clone(), reward, KeepAlive)?;
 		ValidatorRewardAccounts::<T>::remove(account.clone());
-		BeneficialRewardRecord::<T>::insert(account.clone(), reward);
+		Self::store_reward_received(account,reward);
 		Ok(())
 	}
 
 	/// Distributes rewards to the specified nominator.
 	fn distribute_nominator_reward(account: T::AccountId) -> DispatchResult {
 		let reward = NominatorRewardAccounts::<T>::get(account.clone());
+		if reward.is_zero(){
+			return Ok(());
+		}
 		Self::transfer(Self::treasury_account(), account.clone(), reward, KeepAlive)?;
 		let staking_account = T::LiquidStakeVault::staking_account();
 		if account != staking_account {
 			NominatorRewardAccounts::<T>::remove(account.clone());
 		}
-		BeneficialRewardRecord::<T>::insert(account.clone(), reward);
+		Self::store_reward_received(account,reward);
 		Ok(())
 	}
 
@@ -371,6 +375,12 @@ impl<T: Config> Pallet<T> {
 		let active_era = pallet_staking::Pallet::<T>::active_era().unwrap();
 		let era = active_era.index;
 		era
+	}
+	/// Store the received reward for a specific account.
+	fn store_reward_received(account:T::AccountId,reward:T::Balance){
+		let earlier_reward = BeneficialRewardRecord::<T>::get(account.clone());
+		let new_reward = reward + earlier_reward;
+		BeneficialRewardRecord::<T>::insert(account.clone(), new_reward);
 	}
 
 	/// Compute the reward of the validator
