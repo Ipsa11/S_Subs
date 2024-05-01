@@ -344,6 +344,9 @@ impl<T: Config> Pallet<T> {
 	/// Distributes rewards to the specified validator.
 	fn distribute_validator_reward(account: T::AccountId) -> DispatchResult {
 		let reward = ValidatorRewardAccounts::<T>::get(account.clone());
+		if reward.is_zero(){
+			return Ok(());
+		}
 		Self::transfer(Self::treasury_account(), account.clone(), reward, KeepAlive)?;
 		ValidatorRewardAccounts::<T>::remove(account.clone());
 		Self::store_reward_received(account,reward);
