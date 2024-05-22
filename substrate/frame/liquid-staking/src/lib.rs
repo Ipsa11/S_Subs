@@ -84,13 +84,14 @@ pub mod pallet {
 	#[pallet::getter(fn era_reward_account)]
 	pub type EraDerivativeReward<T: Config> = StorageValue<_, Vec<T::AccountId>, OptionQuery>;
 
+    #[pallet::storage]
+    pub type Bonds<T: Config> = StorageMap<_, Blake2_128Concat, T::AccountId, BalanceOf<T>>;
+
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
 		/// The assets get staked successfully
 		Staked(T::AccountId, BalanceOf<T>),
-		/// A new nominator has been set
-		Nominated(T::AccountId, Vec<AccountIdLookupOf<T>>),
 		/// The assets got unstaked successfully
 		UnStaked(T::AccountId, BalanceOf<T>),
 		/// The amount will be unlocked at target era
@@ -107,8 +108,6 @@ pub mod pallet {
 	pub enum Error<T> {
 		/// Invalid liquid currency
 		InvalidLiquidCurrency,
-		/// Invalid staking currency
-		InvalidStakingCurrency,
 		/// Stash wasn't bonded yet
 		NotStaked,
 		/// The stake was below the minimum, `MinStake`.
@@ -117,17 +116,23 @@ pub mod pallet {
 		NothingToClaim,
 		/// There is no unlocking available for the account
 		NoUnlockings,
-		/// Already going to be awarded in this era
-		AlreadyRewarded,
 		/// Please wait for the era to complete
 		WaitTheEraToComplete,
 		/// Not enough amount have been staked
 		InsufficientBalance,
+		/// Not enough amount have been bonded
+		InsufficientBonded,
+		/// No amount have been bonded
+		NotBonded,
+		/// No account in era reward accounts
+		AccountNotInDerivativeReward,
+		/// Not enough stake to nominate
+    	CannotNominate,
 	}
 
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
-		#[pallet::call_index(0)]
+		#[pallet::call_index(1)]
 		#[pallet::weight(Weight::from_parts(10_000, 0) + T::DbWeight::get().writes(1))]
 		pub fn stake(
 			origin: OriginFor<T>,
@@ -139,7 +144,7 @@ pub mod pallet {
 			T::Assets::mint_into(liquid_currency, &who, amount)?;
 			Self::bonded_account(who.clone())?;
 			T::Balances::transfer(&who, &Self::account_id(), amount, Expendable)?;
-			Self::calculate_share(who.clone(), amount)?;
+			Self::update_share(who.clone(), amount)?;
 			MatchingPool::<T>::try_mutate(|p| -> DispatchResult { p.add_stake_amount(amount) })?;
 			Self::deposit_event(Event::<T>::Staked(who, amount.into()));
 			Ok(().into())
@@ -155,9 +160,9 @@ pub mod pallet {
 			let staked_accounts = StakedAccounts::<T>::get();
 			ensure!(staked_accounts.contains(&who), Error::<T>::NotStaked);
 			T::Assets::burn_from(Self::liquid_currency()?, &who, amount, BestEffort, Polite)?;
-			let earlier_amount = AccountStake::<T>::get(who.clone()).unwrap_or(0);
-			ensure!(earlier_amount <= amount, Error::<T>::InsufficientBalance);
-			let new_amount = earlier_amount - amount;
+			let staked_amount = AccountStake::<T>::get(who.clone()).unwrap_or(0);
+			ensure!(amount <= staked_amount, Error::<T>::InsufficientBalance);
+			let new_amount = staked_amount - amount;
 			if new_amount.is_zero() {
 				let mut account = StakedAccounts::<T>::get();
 				if let Some(index) = account.iter().position(|x| *x == who) {
@@ -226,7 +231,9 @@ pub mod pallet {
 
 		#[pallet::call_index(4)]
 		#[pallet::weight(Weight::from_parts(10_000, 0) + T::DbWeight::get().writes(1))]
-		pub fn bond(_origin: OriginFor<T>, balance: BalanceOf<T>) -> DispatchResult {
+		pub fn bond(origin: OriginFor<T>, balance: BalanceOf<T>) -> DispatchResult {
+			let sender = ensure_signed(origin)?;
+			<Bonds<T>>::insert(&sender, balance);
 			pallet_staking::Pallet::<T>::bond(
 				T::RuntimeOrigin::from(frame_system::RawOrigin::Signed(Self::account_id().clone())),
 				balance.into(),
@@ -237,12 +244,26 @@ pub mod pallet {
 
 		#[pallet::call_index(5)]
 		#[pallet::weight(Weight::from_parts(10_000, 0) + T::DbWeight::get().writes(1))]
-		pub fn unbond(_origin: OriginFor<T>, balance: BalanceOf<T>) -> DispatchResultWithPostInfo {
+		pub fn unbond(origin: OriginFor<T>, balance: BalanceOf<T>) -> DispatchResult {
+			let sender = ensure_signed(origin)?;
+			let mut bonded_amount = <Bonds<T>>::get(&sender).ok_or(Error::<T>::NotBonded)?;
+            ensure!(bonded_amount >= balance, Error::<T>::InsufficientBonded);
 			pallet_staking::Pallet::<T>::unbond(
 				T::RuntimeOrigin::from(frame_system::RawOrigin::Signed(Self::account_id().clone())),
 				balance.into()
-			)
+			);
+			bonded_amount -= balance;
+            if bonded_amount.is_zero() {
+            // If the entire bond is unbonded, remove the record from storage
+            <Bonds<T>>::remove(&sender);
+           } else {
+           // Update the bond amount in storage
+           <Bonds<T>>::insert(&sender, bonded_amount);
+           }
+           Ok(())
 		}
+
+		
 		#[pallet::call_index(6)]
 		#[pallet::weight(Weight::from_parts(10_000, 0) + T::DbWeight::get().writes(1))]
 		pub fn withdraw_unbonded(_origin: OriginFor<T>) -> DispatchResultWithPostInfo {
@@ -255,9 +276,24 @@ pub mod pallet {
 		#[pallet::call_index(7)]
 		#[pallet::weight(Weight::from_parts(10_000, 0) + T::DbWeight::get().writes(1))]
 		pub fn nominate(
-			_origin: OriginFor<T>,
+			origin: OriginFor<T>,
 			targets: Vec<AccountIdLookupOf<T>>
 		) -> DispatchResult {
+			let who = ensure_signed(origin.clone())?;
+			let staked_accounts = StakedAccounts::<T>::get();
+			ensure!(staked_accounts.contains(&who), Error::<T>::NotStaked);
+			let staked_amount = AccountStake::<T>::get(who.clone()).unwrap_or(0);
+			// Access the `AccountStake` storage
+			let account_stake_storage = <AccountStake<T>>::iter();
+			// Iterate through all entries and sum up the stake amounts
+			let mut total_staked_amount = 0;
+			for (_, stake) in account_stake_storage {
+				if let stake_amount = stake {
+					total_staked_amount += stake_amount;
+				}
+			}
+			let min_stake = pallet_staking::MinNominatorBond::<T>::get();
+			ensure!(total_staked_amount >= min_stake.into() , Error::<T>:: CannotNominate);
 			pallet_staking::Pallet::<T>::nominate(
 				T::RuntimeOrigin::from(frame_system::RawOrigin::Signed(Self::account_id())),
 				targets
@@ -309,7 +345,10 @@ pub mod pallet {
 
 		#[pallet::call_index(10)]
 		#[pallet::weight(Weight::from_parts(10_000, 0) + T::DbWeight::get().writes(1))]
-		pub fn rebond(_origin: OriginFor<T>, balance: BalanceOf<T>) -> DispatchResultWithPostInfo {
+		pub fn rebond(origin: OriginFor<T>, balance: BalanceOf<T>) -> DispatchResultWithPostInfo {
+			let who = ensure_signed(origin.clone())?;
+			let staked_accounts = StakedAccounts::<T>::get();
+			ensure!(staked_accounts.contains(&who), Error::<T>::NotStaked);
 			pallet_staking::Pallet::<T>::rebond(
 				T::RuntimeOrigin::from(frame_system::RawOrigin::Signed(Self::account_id().clone())),
 				balance.into()
@@ -327,7 +366,7 @@ pub mod pallet {
 		pub fn target_era() -> EraIndex {
 			pallet_staking::Pallet::<T>::current_era().unwrap_or(0) + T::BondingDuration::get() + 1
 		}
-		pub fn calculate_share(account: T::AccountId, amount: u128) -> DispatchResult {
+		pub fn update_share(account: T::AccountId, amount: u128) -> DispatchResult {
 			let already_present_amount = AccountStake::<T>::get(account.clone()).unwrap_or(0);
 			let new_amount = already_present_amount + amount;
 			AccountStake::<T>::insert(account.clone(), new_amount);
@@ -383,13 +422,16 @@ impl<T: Config> DerivativeRewardAccount<T::AccountId> for Pallet<T> {
 		);
 		let liquid_currency = Self::liquid_currency()?;
 		let mut era_reward_accounts = EraDerivativeReward::<T>::get().unwrap_or_else(Vec::new);
+		if !era_reward_accounts.contains(&account) {
+			return Err(Error::<T>::AccountNotInDerivativeReward.into());
+		}
 		if let Some(index) = era_reward_accounts.iter().position(|a| a == &account.clone()) {
 			era_reward_accounts.remove(index);
 		}
 		let converted_reward = Self::convert_f64_to_u128(individual_reward);
 		EraDerivativeReward::<T>::put(era_reward_accounts);
 		T::Assets::mint_into(liquid_currency, &account, converted_reward)?;
-		Self::calculate_share(account.clone(), converted_reward)?;
+		Self::update_share(account.clone(), converted_reward)?;
 		Self::deposit_event(Event::<T>::DerivativeReceived(account));
 		Ok(())
 	}
