@@ -669,7 +669,7 @@ parameter_types! {
     pub const LiquidCurrency: CurrencyId = SSAITA;
 	pub const NativeCurrencyId: CurrencyId = SAITA;
 	pub const StakingPalletId: PalletId = PalletId(*b"par/lqsk");
-	pub const MinStake: Balance = 1;
+	pub const MinStake: Balance = 10;
 }
 
 pub struct Decimal;

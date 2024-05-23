@@ -257,8 +257,8 @@ pub mod pallet {
             // If the entire bond is unbonded, remove the record from storage
             <Bonds<T>>::remove(&sender);
            } else {
-           // Update the bond amount in storage
-           <Bonds<T>>::insert(&sender, bonded_amount);
+            // Update the bond amount in storage
+			<Bonds<T>>::mutate(&sender, |bond_amount| *bond_amount = Some(bonded_amount));
            }
            Ok(())
 		}
