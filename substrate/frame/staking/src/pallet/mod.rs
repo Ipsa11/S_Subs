@@ -21,6 +21,7 @@ use codec::Codec;
 use frame_election_provider_support::{
 	ElectionProvider, ElectionProviderBase, SortedListProvider, VoteWeight,
 };
+use frame_support::traits::liquid_staking::DerivativeRewardAccount;
 use frame_support::{
 	pallet_prelude::*,
 	traits::{
@@ -93,6 +94,9 @@ pub mod pallet {
 
 		/// The reward distribution for validator and nominator
 		type RewardDistribution : Rewards<Self::AccountId>;
+
+		/// The reward for the particular individual who have staked 
+		type DerivativeReward:DerivativeRewardAccount<Self::AccountId>;
 
 		/// Just the `Currency::Balance` type; we have this item to allow us to constrain it to
 		/// `From<u64>`.
