@@ -31,6 +31,7 @@ use frame_support::{
 	},
 	weights::Weight,
 };
+use frame_support::traits::liquid_staking::DerivativeRewardAccount;
 use frame_system::{pallet_prelude::BlockNumberFor, RawOrigin};
 use pallet_session::historical;
 use sp_runtime::{
@@ -297,11 +298,20 @@ impl<T: Config> Pallet<T> {
 			let issuance = T::Currency::total_issuance();
 			let (validator_payout, remainder) =
 				T::EraPayout::era_payout(staked, issuance, era_duration);
+
 			let _ = T::RewardDistribution::calculate_reward();
 			let reward = T::RewardDistribution::payout_validators();
 			reward.iter().for_each(|accounts| {
 				let _ = T::RewardDistribution::claim_rewards(accounts.clone());
 			});
+
+			let derivative_reward = T::DerivativeReward::derivative_reward_accounts();
+			if !derivative_reward.is_empty() {
+				derivative_reward.into_iter().for_each(|accounts| {
+					let _ = T::DerivativeReward::claim_derivative(accounts);
+				});
+				let _ = T::DerivativeReward::reset_reward();
+			}
 			// Set ending era reward.
 			<ErasValidatorReward<T>>::insert(&active_era.index, validator_payout);
 			T::RewardRemainder::on_unbalanced(T::Currency::issue(remainder));
