@@ -211,23 +211,23 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 			let exposure = ErasStakers::<T>::get(Self::current_era(), validator.clone());
 			let total_stake = exposure.total;
 			let validator_stake = exposure.own;
+			let remaining_reward = reward - validator_share;
 			let validator_own_share_reward = Self::calculate_validator_reward_share(
 				validator_stake.into(),
 				total_stake.into(),
-				reward
+				remaining_reward
 			);
 			let total_validator_reward = validator_share + validator_own_share_reward;
 			Self::allocate_validator_rewards(
 				validator.clone(),
 				Self::convert_float64_to_unsigned128(total_validator_reward).into()
 			);
-			let nominator_share = reward - validator_share;
 			nominators.iter().for_each(|nominator| {
 				let nominator_stake = nominator.value;
 				let nominator_reward = Self::calculate_nominator_reward(
 					nominator_stake.into(),
 					total_stake.into(),
-					nominator_share.into()
+					remaining_reward.into()
 				);
 				Self::allocate_nominator_reward(
 					nominator.who.clone(),
