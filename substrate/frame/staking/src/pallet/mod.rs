@@ -109,6 +109,7 @@ pub mod pallet {
 			+ From<u64>
 			+ From<u128>
 			+ Into<u128>
+			// + Into<f64>
 			+ TypeInfo
 			+ MaxEncodedLen;
 		/// Time used for computing era duration.

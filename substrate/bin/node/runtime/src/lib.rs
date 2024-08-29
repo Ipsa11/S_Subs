@@ -712,7 +712,6 @@ parameter_types! {
 	pub const EraMinutes:u32 = 1;
 	pub const DecimalPrecision:u32 = 12;
 	pub const TotalMinutesPerYear:u32 = 525600; 
-	pub const TotalReward :u32 = 1113158;
 }
 impl pallet_reward::Config for Runtime{
 	type Validators = Historical;
@@ -728,7 +727,6 @@ impl pallet_reward::Config for Runtime{
 	type LiquidStakeVault = LiquidStaking;
 	type TotalMinutesPerYear = TotalMinutesPerYear;
 	type EraMinutes = EraMinutes;
-	type TotalReward = TotalReward;
 }
 
 impl pallet_fast_unstake::Config for Runtime {

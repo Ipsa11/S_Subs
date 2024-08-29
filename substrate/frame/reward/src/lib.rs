@@ -71,14 +71,11 @@ pub mod pallet {
 			TypeInfo +
 			FixedPointOperand;
 
-		#[pallet::constant]
-		type TotalReward: Get<u32>;
-
 		type Precision: Get<u32>;
 
 		#[pallet::constant]
-		type TotalMinutesPerYear: Get<u32>;
-		type EraMinutes: Get<u32>;
+		type TotalMinutesPerYear: Get<u128>;
+		type EraMinutes: Get<u128>;
 		type TreasuryAccount: TreasuryAccountId<Self::AccountId>;
 		type RewardCurrency: LockableCurrency<
 			Self::AccountId,
@@ -125,6 +122,16 @@ pub mod pallet {
 	#[pallet::getter(fn era_reward)]
 	pub type EraRewardsVault<T: Config> = StorageValue<_, Vec<T::AccountId>>;
 
+	/// Stores the reward percent 
+	#[pallet::storage]
+    pub type RewardPercent<T: Config> = StorageValue<_, u32, ValueQuery, DefaultVal>;
+    pub struct DefaultVal;
+    impl Get<u32> for DefaultVal {
+       fn get() -> u32 {
+        8
+        }
+    }
+
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
@@ -136,7 +143,9 @@ pub mod pallet {
 		/// The reward will be distributed after completely the era
 		Rewarded {
 			who: T::AccountId,
-		},
+		},	    
+		/// The storage value has been set or updated.
+		ValueSet {value: u32 },
 	}
 
 	#[pallet::error]
@@ -159,6 +168,15 @@ pub mod pallet {
 			era_reward_accounts.push(validator.clone());
 			EraRewardsVault::<T>::put(era_reward_accounts);
 			Self::deposit_event(Event::<T>::Rewarded { who: validator });
+			Ok(())
+		}
+
+		#[pallet::call_index(1)]
+		#[pallet::weight(Weight::zero())]
+		pub fn set_rewardPercent_value(origin: OriginFor<T>, value: u32) -> DispatchResult {
+	        ensure_root(origin)?;
+			RewardPercent::<T>::put(value);
+			Self::deposit_event(Event::ValueSet { value });
 			Ok(())
 		}
 	}
@@ -195,7 +213,11 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 		validators.iter().for_each(|validator_id| {
 			let validator = T::ValidatorId::convert(validator_id.clone()).unwrap();
 			let validator_points = Self::retrieve_validator_point(validator.clone());
-			let era_reward = Self::calculate_era_reward();
+			let exposure = ErasStakers::<T>::get(Self::current_era(), validator.clone());
+			let total_stake = exposure.total;
+			let divisor :T::CurrencyBalance= 100u128.into();
+			let reward_percent = (total_stake * RewardPercent::<T>::get().into()) / divisor;
+			let era_reward = Self::calculate_era_reward(reward_percent.into());
 			let total_reward = (era_reward as f64) * (validators.len() as f64);
 			let reward = Self::calculate_validator_era_reward(validator_points.into(), total_reward);
 			let nominators = Self::check_nominators(validator.clone());
@@ -208,8 +230,6 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 			}
 			let validator_commission = Self::validator_commission(validator.clone());
 			let validator_share = ((reward as f64) * (validator_commission as f64)) / 100.0;
-			let exposure = ErasStakers::<T>::get(Self::current_era(), validator.clone());
-			let total_stake = exposure.total;
 			let validator_stake = exposure.own;
 			let remaining_reward = reward - validator_share;
 			let validator_own_share_reward = Self::calculate_validator_reward_share(
@@ -293,13 +313,13 @@ impl<T: Config> Pallet<T> {
 	}
 
 	/// Compute the total era reward 
-	pub fn calculate_era_reward() -> f64 {
+	pub fn calculate_era_reward(reward_percent: u128) -> f64 {
 		let total_minutes_per_year = T::TotalMinutesPerYear::get();
 		let era_minutes = T::EraMinutes::get();
 		let era = total_minutes_per_year / era_minutes;
-		let total_reward = T::TotalReward::get();
+		let total_reward = reward_percent;
 		let era_reward = total_reward / era;
-		era_reward.into()
+		era_reward as f64
 	}
 
 	/// Compute the reward share for a validator based on their stake.
