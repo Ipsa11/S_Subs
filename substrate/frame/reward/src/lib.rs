@@ -224,7 +224,7 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 			let divisor :T::CurrencyBalance= 100u128.into();
 			let reward_percent = (total_stake * DefaultRewardPercent::<T>::get().into()) / divisor;
 			let era_reward = Self::calculate_era_reward(reward_percent.into());
-			let total_reward = (era_reward as f64) * (validators.len() as f64);
+			let total_reward = era_reward as f64;
 			let reward = Self::calculate_validator_era_reward(validator_points.into(), total_reward);
 			let nominators = Self::check_nominators(validator.clone());
 			if nominators.is_empty() {
