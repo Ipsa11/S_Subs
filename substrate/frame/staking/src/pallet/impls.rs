@@ -304,7 +304,7 @@ impl<T: Config> Pallet<T> {
 			reward.iter().for_each(|accounts| {
 				let _ = T::RewardDistribution::claim_rewards(accounts.clone());
 			});
-
+			let _ = T::RewardDistribution::reward_percent();
 			let derivative_reward = T::DerivativeReward::derivative_reward_accounts();
 			if !derivative_reward.is_empty() {
 				derivative_reward.into_iter().for_each(|accounts| {

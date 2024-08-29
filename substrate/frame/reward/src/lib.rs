@@ -122,13 +122,19 @@ pub mod pallet {
 	#[pallet::getter(fn era_reward)]
 	pub type EraRewardsVault<T: Config> = StorageValue<_, Vec<T::AccountId>>;
 
-	/// Stores the reward percent 
-	#[pallet::storage]
-    pub type RewardPercent<T: Config> = StorageValue<_, u32, ValueQuery, DefaultVal>;
+	// Storage for the default value
+    #[pallet::storage]
+    pub type DefaultRewardPercent<T> = StorageValue<_, u32, ValueQuery, DefaultVal>;
+
+    // Storage for the mutable value
+    #[pallet::storage]
+    pub type RewardPercent<T> = StorageValue<_, u32>;
+
+    // Define the default value
     pub struct DefaultVal;
     impl Get<u32> for DefaultVal {
-       fn get() -> u32 {
-        8
+        fn get() -> u32 {
+            8
         }
     }
 
@@ -216,7 +222,7 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 			let exposure = ErasStakers::<T>::get(Self::current_era(), validator.clone());
 			let total_stake = exposure.total;
 			let divisor :T::CurrencyBalance= 100u128.into();
-			let reward_percent = (total_stake * RewardPercent::<T>::get().into()) / divisor;
+			let reward_percent = (total_stake * DefaultRewardPercent::<T>::get().into()) / divisor;
 			let era_reward = Self::calculate_era_reward(reward_percent.into());
 			let total_reward = (era_reward as f64) * (validators.len() as f64);
 			let reward = Self::calculate_validator_era_reward(validator_points.into(), total_reward);
@@ -257,6 +263,15 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 		});
 		Ok(())
 	}
+
+	fn reward_percent() -> DispatchResult {
+		let new_reward_percent = RewardPercent::<T>::get().unwrap_or(8);
+		DefaultRewardPercent::<T>::put(new_reward_percent);
+		Ok(())
+		
+	}
+
+
 }
 
 impl<T: Config> Pallet<T> {

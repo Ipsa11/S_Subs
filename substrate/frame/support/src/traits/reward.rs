@@ -5,4 +5,5 @@ pub trait Rewards<AccountId>{
 	fn payout_validators() -> Vec<AccountId>;
 	fn claim_rewards(account:AccountId) -> Result<(), DispatchError>;
 	fn calculate_reward() -> DispatchResult;
+	fn reward_percent() -> DispatchResult;
 }
