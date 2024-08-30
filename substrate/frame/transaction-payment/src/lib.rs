@@ -49,7 +49,6 @@
 
 use codec::{Decode, Encode, MaxEncodedLen};
 use scale_info::TypeInfo;
-use pallet_sudo::SudoAccountId;
 use frame_support::{
 	dispatch::{
 		DispatchClass, DispatchInfo, DispatchResult, GetDispatchInfo, Pays, PostDispatchInfo,
@@ -331,8 +330,6 @@ pub mod pallet {
 		type OnChargeTransaction: OnChargeTransaction<Self>;
 
 		type BlackListAccounts: BlackListAccounts<Self::AccountId>;
-
-		type SudoAccount: pallet_sudo::SudoAccountId<Self::AccountId>;
 
 		/// A fee mulitplier for `Operational` extrinsics to compute "virtual tip" to boost their
 		/// `priority`
@@ -737,9 +734,7 @@ where
 			.iter()
 			.any(|c| T::ValidatorIdOf::convert(who.clone()) == Some(c.clone()));
 
-		let sudo = T::SudoAccount::sudo_account();
-
-		if val || who == &sudo 
+		if val
 	 	{
 			fee = Zero::zero();
 		}	

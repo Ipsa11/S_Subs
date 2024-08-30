@@ -546,7 +546,6 @@ impl pallet_transaction_payment::Config for Runtime {
 		MinimumMultiplier,
 		MaximumMultiplier,
 	>;
-	type SudoAccount = Sudo;
 	type ValidatorIdOf = pallet_staking::StashOf<Self>;
 	type ValidatorSet = Historical;
 	type DataProvider = <Runtime as pallet_election_provider_multi_phase::Config>::DataProvider;
