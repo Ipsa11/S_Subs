@@ -16,7 +16,7 @@ use scale_info::prelude::vec::Vec;
 use pallet_staking::{ CurrentEra, UnlockChunk };
 use crate::types::{ MatchingLedger, LiquidStakingCurrenciesProvider, DecimalProvider };
 use sp_runtime::traits::{ StaticLookup, Zero, AccountIdConversion };
-use pallet_reward::NominatorRewardAccounts;
+use pallet_reward::{NominatorRewardAccounts,EraReward};
 pub type AccountIdLookupOf<T> = <<T as frame_system::Config>::Lookup as StaticLookup>::Source;
 pub type BalanceOf<T> =
 	<<T as Config>::Assets as Inspects<<T as frame_system::Config>::AccountId>>::Balance;
@@ -282,7 +282,6 @@ pub mod pallet {
 			let who = ensure_signed(origin.clone())?;
 			let staked_accounts = StakedAccounts::<T>::get();
 			ensure!(staked_accounts.contains(&who), Error::<T>::NotStaked);
-			let staked_amount = AccountStake::<T>::get(who.clone()).unwrap_or(0);
 			// Access the `AccountStake` storage
 			let account_stake_storage = <AccountStake<T>>::iter();
 			// Iterate through all entries and sum up the stake amounts
@@ -414,7 +413,13 @@ impl<T: Config> DerivativeRewardAccount<T::AccountId> for Pallet<T> {
 		let individual_stake = AccountStake::<T>::get(account.clone()).unwrap_or(0);
 		let pool = MatchingPool::<T>::get();
 		let total_stake = pool.total_stake_amount.total;
-		let nominator_reward = NominatorRewardAccounts::<T>::get(Self::account_id());
+		let mut nominator_reward :T::Balance = 0u128.into();
+		if let Some(nominator) = pallet_staking::Nominators::<T>::get(Self::account_id()) {
+			for validator in &nominator.targets {
+				let reward = NominatorRewardAccounts::<T>::get(validator,Self::account_id());
+				nominator_reward += reward;
+				}
+		}
 		let individual_reward = Self::calculate_reward(
 			individual_stake,
 			total_stake,
@@ -436,7 +441,20 @@ impl<T: Config> DerivativeRewardAccount<T::AccountId> for Pallet<T> {
 		Ok(())
 	}
 	fn reset_reward() -> DispatchResult {
-		NominatorRewardAccounts::<T>::remove(Self::account_id());
+		if let Some(nominator) = pallet_staking::Nominators::<T>::get(Self::account_id()) {
+		for validator in nominator.targets{
+		let mut nominators = EraReward::<T>::get(validator.clone());
+			if
+				let Some(index) = nominators
+					.iter()
+					.position(|nominator_account| nominator_account == &Self::account_id().clone())
+			{
+				nominators.remove(index);
+			}
+			EraReward::<T>::insert(validator.clone(),nominators.clone());
+			NominatorRewardAccounts::<T>::remove(validator,Self::account_id());
+		}
+	}
 		Ok(())
 	}
 }
