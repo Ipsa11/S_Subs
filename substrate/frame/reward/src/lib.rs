@@ -228,6 +228,9 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 				None,
 				(total_validator_reward as u128).into(),
 			);
+			if remaining_reward_for_nominators.is_zero(){
+				return;
+			}
 			nominators.iter().for_each(|nominator| {
 				let mut current_nominators = EraReward::<T>::get(validator.clone());
 				if !current_nominators.contains(&nominator.who.clone()) {
