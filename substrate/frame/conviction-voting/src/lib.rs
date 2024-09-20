@@ -130,6 +130,9 @@ pub mod pallet {
 		#[pallet::constant]
 		type MaxVotes: Get<u32>;
 
+        #[pallet::constant]
+		type MinStake: Get<BalanceOf<Self, I>>;
+
 		/// The minimum period of vote locking.
 		///
 		/// It should be no shorter than enactment period to ensure that in the case of an approval,
@@ -199,6 +202,8 @@ pub mod pallet {
 		ClassNeeded,
 		/// The class ID supplied is invalid.
 		BadClass,
+		///
+		BelowMinimumStake,
 	}
 
 	#[pallet::call]
@@ -393,6 +398,12 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
 		poll_index: PollIndexOf<T, I>,
 		vote: AccountVote<BalanceOf<T, I>>,
 	) -> DispatchResult {
+		let min_stake = T::MinStake::get();
+		ensure!(
+			vote.balance() >= min_stake,
+			Error::<T, I>::BelowMinimumStake
+		);
+
 		ensure!(
 			vote.balance() <= T::Currency::total_balance(who),
 			Error::<T, I>::InsufficientFunds
